@@ -110,7 +110,7 @@ public class TestAuton extends AutonDriving {
 
 
         //get in position and read skystone
-        
+
 
         pathComplete(500);
     }
