@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.Legacy._;
+package org.firstinspires.ftc.teamcode.Legacy;
 
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;

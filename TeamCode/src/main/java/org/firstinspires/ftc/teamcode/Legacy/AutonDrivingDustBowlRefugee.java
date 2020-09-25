@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.Legacy._;
+package org.firstinspires.ftc.teamcode.Legacy;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
