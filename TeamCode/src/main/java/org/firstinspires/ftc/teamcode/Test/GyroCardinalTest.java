@@ -5,6 +5,7 @@ import android.icu.lang.UCharacter;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -22,7 +23,7 @@ import org.firstinspires.ftc.teamcode.Hardware;
 //import org.firstinspires.ftc.teamcode.src.main.java.org.firstinspires.ftc.teamcode.DriveOnlyHardware;
 
 @Autonomous(name="GyroCardinalTest", group="Test")
-//@Disabled
+@Disabled
 public class GyroCardinalTest extends AutonDriving {
 
     /* Declare OpMode members. */

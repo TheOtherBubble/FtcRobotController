@@ -8,7 +8,7 @@ import org.firstinspires.ftc.teamcode.Hardware;
 //import org.firstinspires.ftc.teamcode.src.main.java.org.firstinspires.ftc.teamcode.DriveOnlyHardware;
 
 
-@TeleOp(name="DriveOnlyTeleop", group="Test")
+@TeleOp(name="DriveOnlyTeleop", group="Teleop")
 
 //@Disabled
 

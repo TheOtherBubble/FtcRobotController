@@ -11,7 +11,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 import org.firstinspires.ftc.teamcode.AutonDriving;
 import org.firstinspires.ftc.teamcode.Hardware;
 
-//@Disabled
+@Disabled
 @Autonomous(name="TurnToPositionTest", group="Test")
 public class TurnToPositionTest extends AutonDriving {
 //    AutonDrivingDriveOnly auton = new AutonDrivingDriveOnly();
