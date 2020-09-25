@@ -97,7 +97,6 @@ public class TestAuton extends AutonDriving {
                 .translation(0, 0, stoneZ)
                 .multiplied(Orientation.getRotationMatrix(EXTRINSIC, XYZ, DEGREES, 90, 0, -90)));
 
-        robot.claw.setPosition(clawPos);
         waitForStart();
 
 
@@ -111,102 +110,7 @@ public class TestAuton extends AutonDriving {
 
 
         //get in position and read skystone
-        gyroDrive(16, NORTH, true, gyroDriveSpeed - .02, moderate, 10);//14 is the only distance that works pls no change
-        turnToPosition(NORTH, "z", turnSpeed + .05, 5, false);
-        String skystone = vuforia(allTrackables, targetsSkyStone);
-
-        //sleep(1000);
-
-        telemetry.addData("Position", skystone);
-        telemetry.update();
-
-        sleep(100);
-
-
-        //turnDegrees(90, "z", turnSpeed, 5);
-
-
-        //aim for corner of block to intake
-        if(skystone.equals("center"))
-        {
-
-            strafe(4, .6, left, leftBal + .01, 362.5, .04);
-            sleep(100);
-            turnToPosition(NORTH + 31, "z", turnSpeed, 10, true);
-            robot.intakeL.setPower(1);
-            robot.intakeR.setPower(1);
-            gyroDrive(30, NORTH + 31, true, gyroDriveSpeed, moderate + .03, 5);
-        }
-
-
-        //TODO: WORK ON ALT SKYSTONE POSITIONS
-        else if(skystone.equals("left"))
-        {
-            strafe(3, .6, left, leftBal + .01, 250, .04);
-
-
-            sleep(100);
-            turnToPosition(NORTH + 15, "z", turnSpeed, 10, false);
-
-
-            robot.intakeL.setPower(1);
-            robot.intakeR.setPower(1);
-            gyroDrive(30, NORTH + 15, true, gyroDriveSpeed, moderate + .03, 10);
-        }
-        else
-        {
-            strafe(6, .6, left, leftBal + .01, 362.5, .04);
-
-
-            sleep(100);
-            turnToPosition(NORTH + 40, "z", turnSpeed, 10, false);
-
-
-            robot.intakeL.setPower(1);
-            robot.intakeR.setPower(1);
-            gyroDrive(30, NORTH + 40, true, gyroDriveSpeed, moderate + .03, 10);
-        }
-
-        sleep(500);
-
-        robot.intakeL.setPower(0);
-        robot.intakeR.setPower(0);
-        //sleep(100);
-        //turnToPosition(EAST, "z", 1, 5, true);
-
-
-        sleep(100);
-
-
-        //strafe under skybridge
-        strafe(1, .9, right, .05, 2000, .03); //2600 for full auto
-        robot.intakeL.setPower(-1);
-        robot.intakeR.setPower(-1);
-
-        //turn towards foundation
-        /*turnToPosition(178, "z", turnSpeed, 5, false);
-
-        //drive towards the foundation & grab
-        sleep(100);
-        gyroDrive(-25, SOUTH, true, gyroDriveSpeed, moderate,10);
-        robot.latch.setPosition(0);
-
-        sleep(1000);
-
-        //turn drive and strafe along wall
-        turnToPosition(EAST, "z", .5, 5, false, true);
-        sleep(100);
-        gyroDrive(-20, WEST, true, gyroDriveSpeed, moderate, 10);
-        strafe(4, .6, right, rightBal,250, .03);
-
-
-        //let go of foundation
-        robot.latch.setPosition(1);
-
-        sleep(1000);
-
-        gyroDrive(10, WEST, true, gyroDriveSpeed, moderate, 10);*/
-
+        
 
         pathComplete(500);
     }
