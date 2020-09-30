@@ -27,14 +27,12 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode.Test;
+package org.firstinspires.ftc.teamcode.Auton;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcontroller.external.samples.HardwarePushbot;
 import org.firstinspires.ftc.teamcode.Hardware;
 
 /**
@@ -58,9 +56,9 @@ import org.firstinspires.ftc.teamcode.Hardware;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Auton Driving Test", group="Pushbot")
+@Autonomous(name="Auton Driving Test With Function", group="Pushbot")
 //@Disabled
-public class AutonDriveTest extends LinearOpMode {
+public class AutonDriveFunctionsTest extends LinearOpMode {
 
     /* Declare OpMode members. */
     Hardware robot = new Hardware();   // Use a Pushbot's hardware
@@ -84,49 +82,75 @@ public class AutonDriveTest extends LinearOpMode {
         // Step through each leg of the path, ensuring that the Auto mode has not been stopped along the way
 
         // Step 1:  Drive forward for 3 seconds
-        robot.fLMotor.setPower(FORWARD_SPEED);
-        robot.fRMotor.setPower(FORWARD_SPEED);
-        robot.bLMotor.setPower(FORWARD_SPEED);
-        robot.bRMotor.setPower(FORWARD_SPEED);
-
-        runtime.reset();
-        while (opModeIsActive() && (runtime.seconds() < 1.5)) {
-            telemetry.addData("Path", "Leg 1: %2.5f S Elapsed", runtime.seconds());
-            telemetry.update();
-        }
+        drive('f', 1.5);
 
         // Step 2:  Spin right for 1.3 seconds
-        robot.fLMotor.setPower(FORWARD_SPEED);
-        robot.fRMotor.setPower(-FORWARD_SPEED);
-        robot.bLMotor.setPower(FORWARD_SPEED);
-        robot.bRMotor.setPower(-FORWARD_SPEED);
-
-        runtime.reset();
-        while (opModeIsActive() && (runtime.seconds() < 1.3)) {
-            telemetry.addData("Path", "Leg 2: %2.5f S Elapsed", runtime.seconds());
-            telemetry.update();
-        }
+        turn('r', 1.0);
 
         // Step 3:  Drive Backwards for 1 Second
-        robot.fLMotor.setPower(-FORWARD_SPEED);
-        robot.fRMotor.setPower(-FORWARD_SPEED);
-        robot.bLMotor.setPower(-FORWARD_SPEED);
-        robot.bRMotor.setPower(-FORWARD_SPEED);
-
-        runtime.reset();
-        while (opModeIsActive() && (runtime.seconds() < 1.0)) {
-            telemetry.addData("Path", "Leg 3: %2.5f S Elapsed", runtime.seconds());
-            telemetry.update();
-        }
+        drive('b', 1.0);
 
         // Step 4:  Stop and close the claw.
-        robot.fLMotor.setPower(0);
-        robot.fRMotor.setPower(0);
-        robot.bLMotor.setPower(0);
-        robot.bRMotor.setPower(0);
+        stopMotor();
 
         telemetry.addData("Path", "Complete");
         telemetry.update();
         sleep(1000);
+    }
+    public void drive(char direction, double time) {
+        if (direction == 'f') {
+            robot.fLMotor.setPower(FORWARD_SPEED);
+            robot.fRMotor.setPower(FORWARD_SPEED);
+            robot.bLMotor.setPower(FORWARD_SPEED);
+            robot.bRMotor.setPower(FORWARD_SPEED);
+        }
+        else if (direction == 'l') {
+            robot.fLMotor.setPower(FORWARD_SPEED);
+            robot.fRMotor.setPower(-FORWARD_SPEED);
+            robot.bLMotor.setPower(-FORWARD_SPEED);
+            robot.bRMotor.setPower(FORWARD_SPEED);
+        }
+        else if (direction == 'r') {
+            robot.fLMotor.setPower(-FORWARD_SPEED);
+            robot.fRMotor.setPower(FORWARD_SPEED);
+            robot.bLMotor.setPower(FORWARD_SPEED);
+            robot.bRMotor.setPower(-FORWARD_SPEED);
+        }
+        else if (direction == 'b') {
+            robot.fLMotor.setPower(-FORWARD_SPEED);
+            robot.fRMotor.setPower(-FORWARD_SPEED);
+            robot.bLMotor.setPower(-FORWARD_SPEED);
+            robot.bRMotor.setPower(-FORWARD_SPEED);
+        }
+        runtime.reset();
+        while (opModeIsActive() && (runtime.seconds() < time)) {
+            telemetry.addData("Path", "Leg 3: %2.5f S Elapsed", runtime.seconds());
+            telemetry.update();
+        }
+    }
+    public void turn(char direction, double time) {
+        if (direction == 'r') {
+            robot.fLMotor.setPower(FORWARD_SPEED);
+            robot.fRMotor.setPower(-FORWARD_SPEED);
+            robot.bLMotor.setPower(FORWARD_SPEED);
+            robot.bRMotor.setPower(-FORWARD_SPEED);
+        }
+        else if (direction == 'l') {
+            robot.fLMotor.setPower(-FORWARD_SPEED);
+            robot.fRMotor.setPower(FORWARD_SPEED);
+            robot.bLMotor.setPower(-FORWARD_SPEED);
+            robot.bRMotor.setPower(FORWARD_SPEED);
+        }
+        runtime.reset();
+        while (opModeIsActive() && (runtime.seconds() < time)) {
+            telemetry.addData("Path", "Leg 3: %2.5f S Elapsed", runtime.seconds());
+            telemetry.update();
+        }
+    }
+    public void stopMotor() {
+        robot.fLMotor.setPower(0);
+        robot.fRMotor.setPower(0);
+        robot.bLMotor.setPower(0);
+        robot.bRMotor.setPower(0);
     }
 }

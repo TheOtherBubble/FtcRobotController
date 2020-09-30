@@ -27,7 +27,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode.Test;
+package org.firstinspires.ftc.teamcode.Auton;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -58,14 +58,14 @@ import org.firstinspires.ftc.teamcode.Hardware;
 
 @Autonomous(name="Auton Driving Test With Function", group="Pushbot")
 //@Disabled
-public class AutonDriveFunctionsTest extends LinearOpMode {
+public class AutonMecanumDriveFunctions extends LinearOpMode {
 
     /* Declare OpMode members. */
     Hardware robot = new Hardware();   // Use a Pushbot's hardware
     private ElapsedTime     runtime = new ElapsedTime();
 
 
-    static final double     FORWARD_SPEED = 0.4;
+    static final double     speed = 0.4;
 
     @Override
     public void runOpMode() {
@@ -82,13 +82,13 @@ public class AutonDriveFunctionsTest extends LinearOpMode {
         // Step through each leg of the path, ensuring that the Auto mode has not been stopped along the way
 
         // Step 1:  Drive forward for 3 seconds
-        drive('f', 1.5);
+        drive(speed,0, 1.5);
 
         // Step 2:  Spin right for 1.3 seconds
         turn('r', 1.0);
 
         // Step 3:  Drive Backwards for 1 Second
-        drive('b', 1.0);
+        drive(speed,180, 1.0);
 
         // Step 4:  Stop and close the claw.
         stopMotor();
@@ -97,31 +97,18 @@ public class AutonDriveFunctionsTest extends LinearOpMode {
         telemetry.update();
         sleep(1000);
     }
-    public void drive(char direction, double time) {
-        if (direction == 'f') {
-            robot.fLMotor.setPower(FORWARD_SPEED);
-            robot.fRMotor.setPower(FORWARD_SPEED);
-            robot.bLMotor.setPower(FORWARD_SPEED);
-            robot.bRMotor.setPower(FORWARD_SPEED);
-        }
-        else if (direction == 'l') {
-            robot.fLMotor.setPower(FORWARD_SPEED);
-            robot.fRMotor.setPower(-FORWARD_SPEED);
-            robot.bLMotor.setPower(-FORWARD_SPEED);
-            robot.bRMotor.setPower(FORWARD_SPEED);
-        }
-        else if (direction == 'r') {
-            robot.fLMotor.setPower(-FORWARD_SPEED);
-            robot.fRMotor.setPower(FORWARD_SPEED);
-            robot.bLMotor.setPower(FORWARD_SPEED);
-            robot.bRMotor.setPower(-FORWARD_SPEED);
-        }
-        else if (direction == 'b') {
-            robot.fLMotor.setPower(-FORWARD_SPEED);
-            robot.fRMotor.setPower(-FORWARD_SPEED);
-            robot.bLMotor.setPower(-FORWARD_SPEED);
-            robot.bRMotor.setPower(-FORWARD_SPEED);
-        }
+    public void drive(double r, int angle, double time) {
+
+        final double v1 = r * Math.cos(angle);
+        final double v2 = r * Math.sin(angle);
+        final double v3 = r * Math.sin(angle);
+        final double v4 = r * Math.cos(angle);
+
+        robot.fLMotor.setPower(-v1);
+        robot.fRMotor.setPower(-v2);
+        robot.bLMotor.setPower(-v3);
+        robot.bRMotor.setPower(-v4);
+
         runtime.reset();
         while (opModeIsActive() && (runtime.seconds() < time)) {
             telemetry.addData("Path", "Leg 3: %2.5f S Elapsed", runtime.seconds());
@@ -130,16 +117,16 @@ public class AutonDriveFunctionsTest extends LinearOpMode {
     }
     public void turn(char direction, double time) {
         if (direction == 'r') {
-            robot.fLMotor.setPower(FORWARD_SPEED);
-            robot.fRMotor.setPower(-FORWARD_SPEED);
-            robot.bLMotor.setPower(FORWARD_SPEED);
-            robot.bRMotor.setPower(-FORWARD_SPEED);
+            robot.fLMotor.setPower(speed);
+            robot.fRMotor.setPower(-speed);
+            robot.bLMotor.setPower(speed);
+            robot.bRMotor.setPower(-speed);
         }
         else if (direction == 'l') {
-            robot.fLMotor.setPower(-FORWARD_SPEED);
-            robot.fRMotor.setPower(FORWARD_SPEED);
-            robot.bLMotor.setPower(-FORWARD_SPEED);
-            robot.bRMotor.setPower(FORWARD_SPEED);
+            robot.fLMotor.setPower(-speed);
+            robot.fRMotor.setPower(speed);
+            robot.bLMotor.setPower(-speed);
+            robot.bRMotor.setPower(speed);
         }
         runtime.reset();
         while (opModeIsActive() && (runtime.seconds() < time)) {
