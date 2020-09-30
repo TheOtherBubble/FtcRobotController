@@ -87,12 +87,15 @@ public class AutonMecanumDriveFunctions extends LinearOpMode {
         // Step 2:  Spin right for 1.3 seconds
         turn('r', 0.5);
 
-        drive(speed, 270, 0.5);
+        drive(speed, 223, 0.5);
 
         // Step 3:  Drive Backwards for 1 Second
         drive(speed,180, 0.5);
 
         drive(speed, 120, 0.5);
+
+        drive(speed, 90, 0.5);
+        drive(speed, 270, 0.5);
 
         // Step 4:  Stop and close the claw.
         stopMotor();
