@@ -65,7 +65,7 @@ public class AutonMecanumDriveFunctions extends LinearOpMode {
     private ElapsedTime     runtime = new ElapsedTime();
 
 
-    static final double     speed = 0.4;
+    static final double     speed = 0.6;
 
     @Override
     public void runOpMode() {
@@ -82,13 +82,17 @@ public class AutonMecanumDriveFunctions extends LinearOpMode {
         // Step through each leg of the path, ensuring that the Auto mode has not been stopped along the way
 
         // Step 1:  Drive forward for 3 seconds
-        drive(speed,0, 1.5);
+        drive(speed,0, 0.5);
 
         // Step 2:  Spin right for 1.3 seconds
-        turn('r', 1.0);
+        turn('r', 0.5);
+
+        drive(speed, 270, 0.5);
 
         // Step 3:  Drive Backwards for 1 Second
-        drive(speed,180, 1.0);
+        drive(speed,180, 0.5);
+
+        drive(speed, 120, 0.5);
 
         // Step 4:  Stop and close the claw.
         stopMotor();
