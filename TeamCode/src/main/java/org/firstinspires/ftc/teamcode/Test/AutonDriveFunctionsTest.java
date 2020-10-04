@@ -29,11 +29,43 @@
 
 package org.firstinspires.ftc.teamcode.Test;
 
+import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.teamcode.Hardware;
+
+import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+import com.qualcomm.robotcore.hardware.DcMotor;
+
+import org.firstinspires.ftc.robotcore.external.ClassFactory;
+import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import org.firstinspires.ftc.robotcore.external.navigation.Position;
+import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
+//import org.firstinspires.ftc.teamcode.src.main.java.org.firstinspires.ftc.teamcode.Auton.AutonDrivingDustBowlRefugee;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
+import org.firstinspires.ftc.teamcode.AutonDriving;
+
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.DEGREES;
+import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.XYZ;
+import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.YZX;
+import static org.firstinspires.ftc.robotcore.external.navigation.AxesReference.EXTRINSIC;
+import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.CameraDirection.BACK;
+import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.CameraDirection.DEFAULT;
 
 /**
  * This file illustrates the concept of driving a path based on time.
@@ -58,11 +90,13 @@ import org.firstinspires.ftc.teamcode.Hardware;
 
 @Autonomous(name="Auton Driving Test With Function", group="Pushbot")
 //@Disabled
-public class AutonDriveFunctionsTest extends LinearOpMode {
+public class AutonDriveFunctionsTest extends AutonDriving {
 
     /* Declare OpMode members. */
-    Hardware robot = new Hardware();   // Use a Pushbot's hardware
+    //Hardware robot = new Hardware();   // Use a Pushbot's hardware
     private ElapsedTime     runtime = new ElapsedTime();
+    private String ringStack = "";
+    private float detectionTime = 1 * 1000;
 
 
     static final double     FORWARD_SPEED = 0.4;
@@ -70,25 +104,123 @@ public class AutonDriveFunctionsTest extends LinearOpMode {
     @Override
     public void runOpMode() {
 
+        robot.init((hardwareMap));
+
+        BNO055IMU.Parameters p = new BNO055IMU.Parameters();
+        p.angleUnit = BNO055IMU.AngleUnit.DEGREES;
+        p.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+        p.calibrationDataFile = "BNO055IMUCalibration.json";
+        p.loggingEnabled = true;
+        p.loggingTag = "IMU";
+        p.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
+        imu = hardwareMap.get(BNO055IMU.class, "imu");
+        imu.initialize(p);
+
+        robot.fLMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.fRMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        robot.fLMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.fRMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        //lateral motors
+        robot.bLMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.bRMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        robot.bLMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.bRMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        initVuforia();
+        initTfod();
         /*
          * Initialize the drive system variables.
          * The init() method of the hardware class does all the work here
          */
-        robot.init(hardwareMap);
 
+        if (tfod != null) {
+            tfod.activate();
+        }
+
+
+
+        if (tfod != null) {
+            tfod.shutdown();
+        }
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
 
+        if (opModeIsActive()) {
+            runtime.reset();
+            while (opModeIsActive()) {
+                if (tfod != null) {
+                    // getUpdatedRecognitions() will return null if no new information is available since
+                    // the last time that call was made.
+                    List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
+                    if (updatedRecognitions != null) {
+                        telemetry.addData("# Object Detected", updatedRecognitions.size());
+                        // step through the list of recognitions and display boundary info.
+                        int i = 0;
+                        for (Recognition recognition : updatedRecognitions) {
+                            telemetry.addData(String.format("label (%d)", i), recognition.getLabel());
+                            ringStack = recognition.getLabel();
+                            telemetry.addData(String.format("  left,top (%d)", i), "%.03f , %.03f",
+                                    recognition.getLeft(), recognition.getTop());
+                            telemetry.addData(String.format("  right,bottom (%d)", i), "%.03f , %.03f",
+                                    recognition.getRight(), recognition.getBottom());
+                        }
+                        telemetry.addData("millis", runtime.milliseconds());
+                        telemetry.update();
+                        if(runtime.milliseconds() > detectionTime)
+                        {
+                            break;
+                        }
+                    }
+                    else if(runtime.milliseconds() > detectionTime)
+                    {
+                        break;
+                    }
+                }
+                else if(runtime.milliseconds() > detectionTime)
+                {
+                    break;
+                }
+            }
+        }
         // Step through each leg of the path, ensuring that the Auto mode has not been stopped along the way
 
-        // Step 1:  Drive forward for 3 seconds
-        drive('f', 1.5);
+        runtime.reset();
+        switch (ringStack)
+        {
+            case "Single":
+            {
+                telemetry.addData("Single Case", null);
+                gyroDrive(5, 1, false, gyroDriveSpeed, 1, 5);
+                break;
+            }
+            case "Quad":
+            {
+                telemetry.addData("Quad Case", null);
+                gyroDrive(10, 1, false, gyroDriveSpeed, 1, 5);
+                break;
+            }
+            default:
+            {
+                telemetry.addData("Default Case", null);
+                gyroDrive(15, 1, false, gyroDriveSpeed, 1, 5);
+                break;
+            }
+        }
+        telemetry.update();
 
-        // Step 2:  Spin right for 1.3 seconds
-        turn('r', 1.0);
 
-        // Step 3:  Drive Backwards for 1 Second
-        drive('b', 1.0);
+
+//        // Step 1:  Drive forward for 3 seconds
+//        drive('f', 1.5);
+//
+//        // Step 2:  Spin right for 1.3 seconds
+//        turn('r', 1.0);
+//
+//        // Step 3:  Drive Backwards for 1 Second
+//        drive('b', 1.0);
 
         // Step 4:  Stop and close the claw.
         stopMotor();
