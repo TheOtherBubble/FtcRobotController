@@ -130,14 +130,16 @@ public class AutonVisionTest extends LinearOpMode {
         }
 
         if (ringLabel.equals("Quad")) {
-
+            drive('f', 1);
         }
 
         else if (ringLabel.equals("Single")) {
-
+            drive('f', 1);
+            turn('r', 1);
         }
         else {
-
+            drive('f', 1);
+            turn('l', 1);
         }
     }
     private void drive(char direction, double time) {
