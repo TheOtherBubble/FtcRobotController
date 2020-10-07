@@ -42,28 +42,7 @@ import org.firstinspires.ftc.teamcode.Hardware;
 
 import java.util.List;
 
-/**
- * This file illustrates the concept of driving a path based on time.
- * It uses the common Pushbot hardware class to define the drive on the robot.
- * The code is structured as a LinearOpMode
- *
- * The code assumes that you do NOT have encoders on the wheels,
- *   otherwise you would use: PushbotAutoDriveByEncoder;
- *
- *   The desired path in this example is:
- *   - Drive forward for 3 seconds
- *   - Spin right for 1.3 seconds
- *   - Drive Backwards for 1 Second
- *   - Stop and close the claw.
- *
- *  The code is written in a simple form with no optimizations.
- *  However, there are several ways that this type of sequence could be streamlined,
- *
- * Use Android Studios to Copy this Class, and Paste it into your team's code folder with a new name.
- * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
- */
-
-@Autonomous(name="Auton Driving Test With Function", group="Pushbot")
+@Autonomous(name="Auton Vision Test", group="FullAuton")
 //@Disabled
 public class AutonVisionTest extends LinearOpMode {
 
@@ -97,13 +76,17 @@ public class AutonVisionTest extends LinearOpMode {
         initVuforia();
         initTfod();
 
+        if (tfod != null) {
+            tfod.activate();
+        }
+
         robot.init(hardwareMap);
 
         waitForStart();
 
         if (opModeIsActive()) {
+            runtime.reset();
             do {
-                runtime.reset();
                 if (tfod != null) {
                     // getUpdatedRecognitions() will return null if no new information is available since
                     // the last time that call was made.
@@ -130,14 +113,17 @@ public class AutonVisionTest extends LinearOpMode {
         }
 
         if (ringLabel.equals("Quad")) {
-            telemetry.addData("Data", "Quad");
+            telemetry.addData("Pathing", "Quad");
+            telemetry.update();
         }
 
         else if (ringLabel.equals("Single")) {
-            telemetry.addData("Data", "Single");
+            telemetry.addData("Pathing", "Single");
+            telemetry.update();
         }
         else {
-            telemetry.addData("Data", "None");
+            telemetry.addData("Pathing", "None");
+            telemetry.update();
         }
     }
     private void drive(char direction, double time) {

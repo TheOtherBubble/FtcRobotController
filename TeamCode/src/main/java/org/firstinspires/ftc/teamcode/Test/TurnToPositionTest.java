@@ -12,7 +12,7 @@ import org.firstinspires.ftc.teamcode.AutonDriving;
 import org.firstinspires.ftc.teamcode.Hardware;
 
 @Disabled
-@Autonomous(name="TurnToPositionTest", group="Test")
+@Autonomous(name="TurnToPositionTest", group="GyroAuton")
 public class TurnToPositionTest extends AutonDriving {
 //    AutonDrivingDriveOnly auton = new AutonDrivingDriveOnly();
 

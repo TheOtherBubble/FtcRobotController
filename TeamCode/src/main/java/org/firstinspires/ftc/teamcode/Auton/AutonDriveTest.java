@@ -58,7 +58,7 @@ import org.firstinspires.ftc.teamcode.Hardware;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Auton Driving Test", group="Pushbot")
+@Autonomous(name="Auton Driving Test", group="FullAuton")
 //@Disabled
 public class AutonDriveTest extends LinearOpMode {
 

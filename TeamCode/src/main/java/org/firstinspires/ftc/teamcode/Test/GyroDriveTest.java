@@ -12,7 +12,7 @@ import org.firstinspires.ftc.teamcode.AutonDriving;
 import org.firstinspires.ftc.teamcode.Hardware;
 
 @Disabled
-@Autonomous(name="GyroDriveTest", group="Test")
+@Autonomous(name="GyroDriveTest", group="GyroAuton")
 public class GyroDriveTest extends AutonDriving {
 //    AutonDrivingDriveOnly auton = new AutonDrivingDriveOnly();
 

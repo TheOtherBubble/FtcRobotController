@@ -59,10 +59,14 @@ public class Hardware
 
         // Set all motors to run without encoders.
         // May want to use RUN_USING_ENCODERS if encoders are installed.
-        fLMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        fRMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        bLMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        bRMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        fLMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        fRMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        bLMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        bRMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        fLMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        fRMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        bLMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        bRMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         launcherMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
 

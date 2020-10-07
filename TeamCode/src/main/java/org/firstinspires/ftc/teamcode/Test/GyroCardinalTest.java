@@ -22,7 +22,7 @@ import org.firstinspires.ftc.teamcode.Hardware;
 
 //import org.firstinspires.ftc.teamcode.src.main.java.org.firstinspires.ftc.teamcode.DriveOnlyHardware;
 
-@Autonomous(name="GyroCardinalTest", group="Test")
+@Autonomous(name="GyroCardinalTest", group="GyroAuton")
 @Disabled
 public class GyroCardinalTest extends AutonDriving {
 
