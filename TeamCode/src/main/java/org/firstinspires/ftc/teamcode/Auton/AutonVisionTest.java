@@ -44,7 +44,7 @@ import java.util.List;
 
 @Autonomous(name="Auton Vision Test", group="FullAuton")
 //@Disabled
-public class AutonVisionTest extends LinearOpMode {
+public class  AutonVisionTest extends LinearOpMode {
 
     /* Declare OpMode members. */
     Hardware robot = new Hardware();   // Use a Pushbot's hardware
@@ -87,6 +87,7 @@ public class AutonVisionTest extends LinearOpMode {
         if (opModeIsActive()) {
             runtime.reset();
             do {
+                telemetry.addData("Runtime", runtime.milliseconds());
                 if (tfod != null) {
                     // getUpdatedRecognitions() will return null if no new information is available since
                     // the last time that call was made.
@@ -101,14 +102,16 @@ public class AutonVisionTest extends LinearOpMode {
                             telemetry.addData(String.format("  left,top (%d)", i), "%.03f , %.03f", recognition.getLeft(), recognition.getTop());
                             telemetry.addData(String.format("  right,bottom (%d)", i), "%.03f , %.03f", recognition.getRight(), recognition.getBottom());
 
+                            telemetry.update();
+
                             if (recognition.getLabel().equals("Quad") || recognition.getLabel().equals("Single")) {
                                 ringLabel = recognition.getLabel();
                                 objectInVision = true;
                             }
                         }
-                        telemetry.update();
                     }
                 }
+                telemetry.update();
             } while (runtime.milliseconds() < 5000 && !(objectInVision));
         }
 

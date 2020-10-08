@@ -95,6 +95,13 @@ public class AutonDriveTest extends LinearOpMode {
             telemetry.update();
         }
 
+        robot.fLMotor.setPower(0);
+        robot.fRMotor.setPower(0);
+        robot.bLMotor.setPower(0);
+        robot.bRMotor.setPower(0);
+
+        sleep(500);
+
         // Step 2:  Spin right for 1.3 seconds
         robot.fLMotor.setPower(FORWARD_SPEED);
         robot.fRMotor.setPower(-FORWARD_SPEED);
@@ -106,6 +113,13 @@ public class AutonDriveTest extends LinearOpMode {
             telemetry.addData("Path", "Leg 2: %2.5f S Elapsed", runtime.seconds());
             telemetry.update();
         }
+
+        robot.fLMotor.setPower(0);
+        robot.fRMotor.setPower(0);
+        robot.bLMotor.setPower(0);
+        robot.bRMotor.setPower(0);
+
+        sleep(500);
 
         // Step 3:  Drive Backwards for 1 Second
         robot.fLMotor.setPower(-FORWARD_SPEED);

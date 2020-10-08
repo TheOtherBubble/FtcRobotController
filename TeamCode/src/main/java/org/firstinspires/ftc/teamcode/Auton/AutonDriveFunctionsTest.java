@@ -70,27 +70,22 @@ public class AutonDriveFunctionsTest extends LinearOpMode {
     @Override
     public void runOpMode() {
 
-        /*
-         * Initialize the drive system variables.
-         * The init() method of the hardware class does all the work here
-         */
         robot.init(hardwareMap);
 
-        // Wait for the game to start (driver presses PLAY)
         waitForStart();
 
-        // Step through each leg of the path, ensuring that the Auto mode has not been stopped along the way
-
-        // Step 1:  Drive forward for 3 seconds
         drive('f', 1.5);
 
-        // Step 2:  Spin right for 1.3 seconds
+        stopMotor();
+        sleep(500);
+
         turn('r', 1.0);
 
-        // Step 3:  Drive Backwards for 1 Second
+        stopMotor();
+        sleep(500);
+
         drive('b', 1.0);
 
-        // Step 4:  Stop and close the claw.
         stopMotor();
 
         telemetry.addData("Path", "Complete");
