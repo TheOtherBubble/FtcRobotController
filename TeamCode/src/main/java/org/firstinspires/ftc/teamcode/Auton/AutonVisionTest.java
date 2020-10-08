@@ -62,7 +62,7 @@ public class  AutonVisionTest extends LinearOpMode {
 
     private TFObjectDetector tfod;
 
-    private String ringLabel = null;
+    private String ringLabel = " ";
 
     public static final String VUFORIA_KEY =
             "AYy6NYn/////AAABmTW3q+TyLUMbg/IXWlIG3BkMMq0okH0hLmwj3CxhPhvUlEZHaOAmESqfePJ57KC2g6UdWLN7OYvc8ihGAZSUJ2JPWAsHQGv6GUAj4BlrMCjHvqhY0w3tV/Azw2wlPmls4FcUCRTzidzVEDy+dtxqQ7U5ZtiQhjBZetAcnLsCYb58dgwZEjTx2+36jiqcFYvS+FlNJBpbwmnPUyEEb32YBBZj4ra5jB0v4IW4wYYRKTNijAQKxco33VYSCbH0at99SqhXECURA55dtmmJxYpFlT/sMmj0iblOqoG/auapQmmyEEXt/T8hv9StyirabxhbVVSe7fPsAueiXOWVm0kCPO+KN/TyWYB9Hg/mSfnNu9i9";
@@ -112,21 +112,36 @@ public class  AutonVisionTest extends LinearOpMode {
                     }
                 }
                 telemetry.update();
-            } while (runtime.milliseconds() < 5000 && !(objectInVision));
+            } while ((runtime.milliseconds() < 5000 && !(objectInVision)) || runtime.milliseconds() < 1000);
         }
 
         if (ringLabel.equals("Quad")) {
-            telemetry.addData("Pathing", "Quad");
+            telemetry.addData("Target Zone", "C");
             telemetry.update();
+            drive('f', 3);
+            sleep(500);
+            turn('r', .5);
+            sleep(500);
+            drive('f', .5);
         }
 
         else if (ringLabel.equals("Single")) {
-            telemetry.addData("Pathing", "Single");
+            telemetry.addData("Target Zone", "B");
             telemetry.update();
+            drive('f',2.5);
+            sleep(500);
+            turn('r', .5);
+            sleep(500);
+            drive('f',.1);
         }
         else {
-            telemetry.addData("Pathing", "None");
+            telemetry.addData("Target Zone", "A");
             telemetry.update();
+            drive('f', 2);
+            sleep(500);
+            turn('r', .5);
+            sleep(500);
+            drive('f', .5);
         }
     }
     private void drive(char direction, double time) {
@@ -159,6 +174,7 @@ public class  AutonVisionTest extends LinearOpMode {
             telemetry.addData("Path", "Leg 3: %2.5f S Elapsed", runtime.seconds());
             telemetry.update();
         }
+        stopMotor();
     }
     private void turn(char direction, double time) {
         if (direction == 'r') {
@@ -178,6 +194,7 @@ public class  AutonVisionTest extends LinearOpMode {
             telemetry.addData("Path", "Leg 3: %2.5f S Elapsed", runtime.seconds());
             telemetry.update();
         }
+        stopMotor();
     }
     private void stopMotor() {
         robot.fLMotor.setPower(0);
