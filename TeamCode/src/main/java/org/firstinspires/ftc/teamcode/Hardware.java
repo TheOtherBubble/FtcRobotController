@@ -69,7 +69,6 @@ public class Hardware
         bRMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         launcherMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-
         fLMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         bLMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         fRMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -77,11 +76,13 @@ public class Hardware
         launcherMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
 
-        fLMotor.setDirection(DcMotor.Direction.REVERSE);//REVERSE
-        fRMotor.setDirection(DcMotor.Direction.FORWARD);//FORWARD
-        bLMotor.setDirection(DcMotor.Direction.REVERSE);//REVERSE
-        bRMotor.setDirection(DcMotor.Direction.FORWARD);//FORWARD
+        fLMotor.setDirection(DcMotor.Direction.FORWARD);//for
+        fRMotor.setDirection(DcMotor.Direction.REVERSE);//rev
+        bLMotor.setDirection(DcMotor.Direction.FORWARD);//for
+        bRMotor.setDirection(DcMotor.Direction.REVERSE);//REV
         launcherMotor.setDirection(DcMotor.Direction.FORWARD);//FORWARD
+
+        launcherServo.scaleRange(0, 0.7);
 
         launcherServo.setPosition(0);
     }
