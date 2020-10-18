@@ -107,15 +107,15 @@ public class AutonDriveFunctionsTest extends AutonDriving {
         gyroDrive(10, .5, false, gyroDriveSpeed, 1, 5);
         stopMotor();
 
-        sleep(1000);
-
-        gyroDrive(30, .5, false, gyroDriveSpeed, 1, 5);
-        stopMotor();
-
-        sleep(1000);
-
-        gyroDrive(10, 90, false, gyroDriveSpeed, 1, 5);
-        stopMotor();
+//        sleep(1000);
+//
+//        gyroDrive(30, .5, false, gyroDriveSpeed, 1, 5);
+//        stopMotor();
+//
+//        sleep(1000);
+//
+//        gyroDrive(10, 90, false, gyroDriveSpeed, 1, 5);
+//        stopMotor();
     }
 
     public void drive(char direction, double time) {

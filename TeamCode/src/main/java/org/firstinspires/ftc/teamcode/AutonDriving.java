@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
 import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
@@ -93,7 +94,7 @@ public class AutonDriving extends LinearOpMode {
     public VuforiaTrackables targetsSkyStone;
 
 
-    public Orientation angles;
+    public Orientation angles = new Orientation();
     public Acceleration gravity;
     public double startAngle = 0;
 
@@ -222,7 +223,13 @@ public class AutonDriving extends LinearOpMode {
 
     public void updateAngles()
     {
-        angles = imu.getAngularOrientation(AxesReference.EXTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        try {
+            angles = imu.getAngularOrientation(AxesReference.EXTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        }
+        catch (NullPointerException e)
+        {
+            telemetry.addData("Null Pointer Exception", "true");
+        }
     }
 
 

@@ -35,11 +35,11 @@ public class ServoLauncherTest extends OpMode {
 
         if(gamepad1.a)
         {
-            robot.launcherServo.setPosition(1);
+            robot.launcherServo.setPosition(0);
         }
         else
         {
-            robot.launcherServo.setPosition(0);
+            robot.launcherServo.setPosition(1);
         }
 
         if(gamepad1.right_bumper)
