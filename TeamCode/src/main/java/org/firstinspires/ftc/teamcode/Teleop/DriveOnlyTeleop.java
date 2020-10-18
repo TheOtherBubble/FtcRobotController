@@ -16,9 +16,8 @@ public class DriveOnlyTeleop extends OpMode {
 
     Hardware robot = new Hardware();
 
-    private float partialDrive = .4f;
-    private float fullDrive = 1f;
-    private float drive;
+    private float drive = .4f;
+    //private float BRDrive = 1f;
 
     @Override
     public void init()
@@ -26,17 +25,20 @@ public class DriveOnlyTeleop extends OpMode {
         //Initialize the hardware variables.
         //The init() method of the hardware class does all the work here
         robot.init(hardwareMap);
+
+
     }
 
     @Override
     public void loop()
 
     {
-        drive = value();
-        mecanumMove(drive);
+
+        mecanumMove();
+
     }
 
-    public void mecanumMove(float driveValue)
+    public void mecanumMove()
     {
         //variables
         double r = Math.hypot(-gamepad1.left_stick_x, gamepad1.left_stick_y);
@@ -47,17 +49,14 @@ public class DriveOnlyTeleop extends OpMode {
         final double v3 = r * Math.sin(robotAngle) + rightX;
         final double v4 = r * Math.cos(robotAngle) - rightX;
 
-        robot.fLMotor.setPower(-driveValue * v1);
-        robot.fRMotor.setPower(-driveValue * v2);
-        robot.bLMotor.setPower(-driveValue * v3);
-        robot.bRMotor.setPower(-driveValue * v4);
-    }
-    public float value() {
-        if (gamepad1.left_bumper) {
-            return fullDrive;
-        }
-        else {
-            return partialDrive;
-        }
+        robot.fLMotor.setPower(-drive * v1);
+        robot.fRMotor.setPower(-drive * v2);
+        robot.bLMotor.setPower(-drive * v3);
+        robot.bRMotor.setPower(-drive * v4);
+
+        telemetry.addData("fLPower", -drive * v1);
+        telemetry.addData("fRPower", -drive * v2);
+        telemetry.addData("bLPower", -drive * v3);
+        telemetry.addData("bRPower", -drive * v4);
     }
 }
