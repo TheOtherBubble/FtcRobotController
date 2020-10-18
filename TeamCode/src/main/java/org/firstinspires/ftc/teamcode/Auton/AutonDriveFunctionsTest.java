@@ -33,6 +33,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.AutonDriving;
 import org.firstinspires.ftc.teamcode.Hardware;
 
 /**
@@ -58,10 +59,11 @@ import org.firstinspires.ftc.teamcode.Hardware;
 
 @Autonomous(name="Auton Driving Test With Function", group="FullAuton")
 //@Disabled
-public class AutonDriveFunctionsTest extends LinearOpMode {
+public class AutonDriveFunctionsTest extends AutonDriving {
 
     /* Declare OpMode members. */
-    Hardware robot = new Hardware();   // Use a Pushbot's hardware
+    //Hardware robot = new Hardware();   // Use a Pushbot's hardware
+
     private ElapsedTime     runtime = new ElapsedTime();
 
 
@@ -74,6 +76,17 @@ public class AutonDriveFunctionsTest extends LinearOpMode {
 
         waitForStart();
 
+        //BasicDriveTest();
+
+        GyroDriveTest();
+
+        telemetry.addData("Path", "Complete");
+        telemetry.update();
+        sleep(1000);
+    }
+
+    public void BasicDriveTest()
+    {
         drive('f', 1.5);
 
         stopMotor();
@@ -87,11 +100,24 @@ public class AutonDriveFunctionsTest extends LinearOpMode {
         drive('b', 1.0);
 
         stopMotor();
-
-        telemetry.addData("Path", "Complete");
-        telemetry.update();
-        sleep(1000);
     }
+
+    public void GyroDriveTest()
+    {
+        gyroDrive(10, .5, false, gyroDriveSpeed, 1, 5);
+        stopMotor();
+
+        sleep(1000);
+
+        gyroDrive(30, .5, false, gyroDriveSpeed, 1, 5);
+        stopMotor();
+
+        sleep(1000);
+
+        gyroDrive(10, 90, false, gyroDriveSpeed, 1, 5);
+        stopMotor();
+    }
+
     public void drive(char direction, double time) {
         if (direction == 'f') {
             robot.fLMotor.setPower(FORWARD_SPEED);

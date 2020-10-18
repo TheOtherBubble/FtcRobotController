@@ -222,7 +222,7 @@ public class AutonDriving extends LinearOpMode {
 
     public void updateAngles()
     {
-        angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        angles = imu.getAngularOrientation(AxesReference.EXTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
     }
 
 
@@ -607,9 +607,10 @@ public class AutonDriving extends LinearOpMode {
     }
 
     public double readAngle(String xyz) {
-        Orientation angles;
+        //Orientation angles;
         Acceleration gravity;
-        angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        //angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        updateAngles();
         if (xyz.equals("x")) {
             return angles.thirdAngle;
         } else if (xyz.equals("y")) {
