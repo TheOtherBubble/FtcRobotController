@@ -79,6 +79,7 @@ public class AutonDriveEncoder extends LinearOpMode {
     static final double     COUNTS_PER_INCH         = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
                                                       (WHEEL_DIAMETER_INCHES * 3.1415);
     static final double     DRIVE_SPEED             = 0.4;
+    static final double     STRAFE_SPEED             = 0.7;
     static final double     TURN_SPEED              = 0.5;
 
     @Override
@@ -122,13 +123,12 @@ public class AutonDriveEncoder extends LinearOpMode {
 //        encoderDrive(DRIVE_SPEED, -24, -24, 4.0);  // S3: Reverse 24 Inches with 4 Sec timeout
         encoderDrive(DRIVE_SPEED,'f', 18, 10);
 
-        sleep(500);
+        sleep(1000);
 
-        encoderDrive(DRIVE_SPEED,'f', 10, 10);
         encoderDrive(DRIVE_SPEED,'b', 10, 10);
-        encoderDrive(DRIVE_SPEED,'f', 5,  10);
-        encoderDrive(DRIVE_SPEED,'r', 10, 10);
-        encoderDrive(DRIVE_SPEED,'l', 10, 10);
+        encoderDrive(DRIVE_SPEED,'f', 10, 10);
+        encoderDrive(STRAFE_SPEED,'r', 10, 10);
+        encoderDrive(STRAFE_SPEED,'l', 10, 10);
 
         sleep(1000);     // pause for servos to move
 
@@ -151,6 +151,8 @@ public class AutonDriveEncoder extends LinearOpMode {
         int newFrontRightTarget = 0;
         int newBackRightTarget = 0;
 
+        int error = getError(speed);
+
         boolean directionIsTrue = true;
 
         // Ensure that the opmode is still active
@@ -158,40 +160,40 @@ public class AutonDriveEncoder extends LinearOpMode {
 
             switch (direction) {
                 case 'f':
-                    newFrontLeftTarget = robot.fLMotor.getCurrentPosition() + (int)(inches * COUNTS_PER_INCH);
-                    newFrontRightTarget = robot.fRMotor.getCurrentPosition() + (int)(inches * COUNTS_PER_INCH);
-                    newBackLeftTarget = robot.bLMotor.getCurrentPosition() + (int)(inches * COUNTS_PER_INCH);
-                    newBackRightTarget = robot.bRMotor.getCurrentPosition() + (int)(inches * COUNTS_PER_INCH);
+                    newFrontLeftTarget = robot.fLMotor.getCurrentPosition() + (int)(inches * COUNTS_PER_INCH) - error;
+                    newFrontRightTarget = robot.fRMotor.getCurrentPosition() + (int)(inches * COUNTS_PER_INCH)- error;
+                    newBackLeftTarget = robot.bLMotor.getCurrentPosition() + (int)(inches * COUNTS_PER_INCH) - error;
+                    newBackRightTarget = robot.bRMotor.getCurrentPosition() + (int)(inches * COUNTS_PER_INCH) - error;
                     robot.fLMotor.setTargetPosition(newFrontLeftTarget);
                     robot.fRMotor.setTargetPosition(newFrontRightTarget);
                     robot.bLMotor.setTargetPosition(newBackLeftTarget);
                     robot.bRMotor.setTargetPosition(newBackRightTarget);
                     break;
                 case 'b':
-                    newFrontLeftTarget = robot.fLMotor.getCurrentPosition() - (int)(inches * COUNTS_PER_INCH);
-                    newFrontRightTarget = robot.fRMotor.getCurrentPosition() - (int)(inches * COUNTS_PER_INCH);
-                    newBackLeftTarget = robot.bLMotor.getCurrentPosition() - (int)(inches * COUNTS_PER_INCH);
-                    newBackRightTarget = robot.bRMotor.getCurrentPosition() - (int)(inches * COUNTS_PER_INCH);
+                    newFrontLeftTarget = robot.fLMotor.getCurrentPosition() - (int)(inches * COUNTS_PER_INCH) + error;
+                    newFrontRightTarget = robot.fRMotor.getCurrentPosition() - (int)(inches * COUNTS_PER_INCH) + error;
+                    newBackLeftTarget = robot.bLMotor.getCurrentPosition() - (int)(inches * COUNTS_PER_INCH) + error;
+                    newBackRightTarget = robot.bRMotor.getCurrentPosition() - (int)(inches * COUNTS_PER_INCH) + error;
                     robot.fLMotor.setTargetPosition(newFrontLeftTarget);
                     robot.fRMotor.setTargetPosition(newFrontRightTarget);
                     robot.bLMotor.setTargetPosition(newBackLeftTarget);
                     robot.bRMotor.setTargetPosition(newBackRightTarget);
                     break;
                 case 'l':
-                    newFrontLeftTarget = robot.fLMotor.getCurrentPosition() - (int)(inches * COUNTS_PER_INCH);
-                    newFrontRightTarget = robot.fRMotor.getCurrentPosition() + (int)(inches * COUNTS_PER_INCH);
-                    newBackLeftTarget = robot.bLMotor.getCurrentPosition() + (int)(inches * COUNTS_PER_INCH);
-                    newBackRightTarget = robot.bRMotor.getCurrentPosition() - (int)(inches * COUNTS_PER_INCH);
+                    newFrontLeftTarget = robot.fLMotor.getCurrentPosition() - (int)(inches * COUNTS_PER_INCH) + error;
+                    newFrontRightTarget = robot.fRMotor.getCurrentPosition() + (int)(inches * COUNTS_PER_INCH) - error;
+                    newBackLeftTarget = robot.bLMotor.getCurrentPosition() + (int)(inches * COUNTS_PER_INCH) - error;
+                    newBackRightTarget = robot.bRMotor.getCurrentPosition() - (int)(inches * COUNTS_PER_INCH) + error;
                     robot.fLMotor.setTargetPosition(newFrontLeftTarget);
                     robot.fRMotor.setTargetPosition(newFrontRightTarget);
                     robot.bLMotor.setTargetPosition(newBackLeftTarget);
                     robot.bRMotor.setTargetPosition(newBackRightTarget);
                     break;
                 case 'r':
-                    newFrontLeftTarget = robot.fLMotor.getCurrentPosition() + (int)(inches * COUNTS_PER_INCH);
-                    newFrontRightTarget = robot.fRMotor.getCurrentPosition() - (int)(inches * COUNTS_PER_INCH);
-                    newBackLeftTarget = robot.bLMotor.getCurrentPosition() - (int)(inches * COUNTS_PER_INCH);
-                    newBackRightTarget = robot.bRMotor.getCurrentPosition() + (int)(inches * COUNTS_PER_INCH);
+                    newFrontLeftTarget = robot.fLMotor.getCurrentPosition() + (int)(inches * COUNTS_PER_INCH) - error;
+                    newFrontRightTarget = robot.fRMotor.getCurrentPosition() - (int)(inches * COUNTS_PER_INCH) + error;
+                    newBackLeftTarget = robot.bLMotor.getCurrentPosition() - (int)(inches * COUNTS_PER_INCH) + error;
+                    newBackRightTarget = robot.bRMotor.getCurrentPosition() + (int)(inches * COUNTS_PER_INCH) - error;
                     robot.fLMotor.setTargetPosition(newFrontLeftTarget);
                     robot.fRMotor.setTargetPosition(newFrontRightTarget);
                     robot.bLMotor.setTargetPosition(newBackLeftTarget);
@@ -263,7 +265,10 @@ public class AutonDriveEncoder extends LinearOpMode {
             robot.bRMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
 
-            sleep(250);   // optional pause after each move
+            sleep(500);   // optional pause after each move
         }
+    }
+    public int getError(double speed) { //me being stupid
+        return (int) (speed * 160);
     }
 }
