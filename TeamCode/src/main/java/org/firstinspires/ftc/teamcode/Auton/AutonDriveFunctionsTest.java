@@ -61,6 +61,10 @@ import org.firstinspires.ftc.teamcode.Hardware;
 //@Disabled
 public class AutonDriveFunctionsTest extends AutonDriving {
 
+
+
+
+
     /* Declare OpMode members. */
     //Hardware robot = new Hardware();   // Use a Pushbot's hardware
 
@@ -104,7 +108,7 @@ public class AutonDriveFunctionsTest extends AutonDriving {
 
     public void GyroDriveTest()
     {
-        gyroDrive(10, .5, false, gyroDriveSpeed, 1, 5);
+        gyroDrive(24, .25, false, gyroDriveSpeedSlow, 1, 5);
         stopMotor();
 
 //        sleep(1000);

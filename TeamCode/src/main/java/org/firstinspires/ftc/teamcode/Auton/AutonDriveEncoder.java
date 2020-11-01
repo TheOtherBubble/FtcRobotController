@@ -75,9 +75,9 @@ public class AutonDriveEncoder extends LinearOpMode {
 
     static final double     COUNTS_PER_MOTOR_REV    = 537.6 ;    // eg: TETRIX Motor Encoder
     static final double     DRIVE_GEAR_REDUCTION    = 0.4 ;     // This is < 1.0 if geared UP
-    static final double     WHEEL_DIAMETER_INCHES   = 3.0 ;     // For figuring circumference
+    static final double     WHEEL_DIAMETER_INCHES   = 2.95276 ;     // For figuring circumference
     static final double     COUNTS_PER_INCH         = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
-                                                      (WHEEL_DIAMETER_INCHES * 3.1415);
+                                                      (WHEEL_DIAMETER_INCHES * Math.PI);
     static final double     DRIVE_SPEED             = 0.4;
     static final double     STRAFE_SPEED             = 0.7;
     static final double     TURN_SPEED              = 0.5;
@@ -125,12 +125,12 @@ public class AutonDriveEncoder extends LinearOpMode {
 
         sleep(1000);
 
-        encoderDrive(DRIVE_SPEED,'b', 10, 10);
-        encoderDrive(DRIVE_SPEED,'f', 10, 10);
-        encoderDrive(STRAFE_SPEED,'r', 10, 10);
-        encoderDrive(STRAFE_SPEED,'l', 10, 10);
+        encoderDrive(DRIVE_SPEED,'f', 20, 10);
+//        encoderDrive(DRIVE_SPEED,'f', 10, 10);
+//        encoderDrive(STRAFE_SPEED,'r', 10, 10);
+//        encoderDrive(STRAFE_SPEED,'l', 10, 10);
 
-        sleep(1000);     // pause for servos to move
+//        sleep(1000);     // pause for servos to move
 
         telemetry.addData("Path", "Complete");
         telemetry.update();
@@ -261,14 +261,15 @@ public class AutonDriveEncoder extends LinearOpMode {
 
             robot.fLMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             robot.fRMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            robot.bLMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             robot.bRMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.bLMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
 
 
             sleep(500);   // optional pause after each move
         }
     }
     public int getError(double speed) { //me being stupid
-        return (int) (speed * 160);
+        return (int) (speed * 200);
     }
 }

@@ -47,7 +47,7 @@ public class AutonDriving extends LinearOpMode {
     //static final double     COUNTS_PER_REV_ARM = 1495; //torquenado
     //static final double     PULLEY_DIAMETER = 1.3;
     // static final double     COUNTS_PER_INCH_ARM = COUNTS_PER_REV_ARM/(PULLEY_DIAMETER * Math.PI);
-    static final double     DRIVE_GEAR_REDUCTION = .420;    // This is < 1.0 if geared UP //On OUR CENTER MOTOR THE GEAR REDUCTION IS .5
+    static final double     DRIVE_GEAR_REDUCTION = .4;    // This is < 1.0 if geared UP //On OUR CENTER MOTOR THE GEAR REDUCTION IS .5
     static final double     WHEEL_DIAMETER_INCHES = 2.95276;     // For figuring circumference
     static final double     COUNTS_PER_INCH = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
             (WHEEL_DIAMETER_INCHES * Math.PI);
@@ -1184,5 +1184,134 @@ public class AutonDriving extends LinearOpMode {
         tfodParameters.minResultConfidence = 0.8f;
         tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
         tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_FIRST_ELEMENT, LABEL_SECOND_ELEMENT);
+    }
+
+    public void encoderDrive(double speed, char direction, double inches, double timeoutS) {
+
+        int newFrontLeftTarget = 0;
+        int newBackLeftTarget = 0;
+        int newFrontRightTarget = 0;
+        int newBackRightTarget = 0;
+
+        int error = getErrorEncoder(speed);
+
+        boolean directionIsTrue = true;
+
+        // Ensure that the opmode is still active
+        if (opModeIsActive()) {
+
+            switch (direction) {
+                case 'f':
+                    newFrontLeftTarget = robot.fLMotor.getCurrentPosition() + (int)(inches * COUNTS_PER_INCH) - error;
+                    newFrontRightTarget = robot.fRMotor.getCurrentPosition() + (int)(inches * COUNTS_PER_INCH)- error;
+                    newBackLeftTarget = robot.bLMotor.getCurrentPosition() + (int)(inches * COUNTS_PER_INCH) - error;
+                    newBackRightTarget = robot.bRMotor.getCurrentPosition() + (int)(inches * COUNTS_PER_INCH) - error;
+                    robot.fLMotor.setTargetPosition(newFrontLeftTarget);
+                    robot.fRMotor.setTargetPosition(newFrontRightTarget);
+                    robot.bLMotor.setTargetPosition(newBackLeftTarget);
+                    robot.bRMotor.setTargetPosition(newBackRightTarget);
+                    break;
+                case 'b':
+                    newFrontLeftTarget = robot.fLMotor.getCurrentPosition() - (int)(inches * COUNTS_PER_INCH) + error;
+                    newFrontRightTarget = robot.fRMotor.getCurrentPosition() - (int)(inches * COUNTS_PER_INCH) + error;
+                    newBackLeftTarget = robot.bLMotor.getCurrentPosition() - (int)(inches * COUNTS_PER_INCH) + error;
+                    newBackRightTarget = robot.bRMotor.getCurrentPosition() - (int)(inches * COUNTS_PER_INCH) + error;
+                    robot.fLMotor.setTargetPosition(newFrontLeftTarget);
+                    robot.fRMotor.setTargetPosition(newFrontRightTarget);
+                    robot.bLMotor.setTargetPosition(newBackLeftTarget);
+                    robot.bRMotor.setTargetPosition(newBackRightTarget);
+                    break;
+                case 'l':
+                    newFrontLeftTarget = robot.fLMotor.getCurrentPosition() - (int)(inches * COUNTS_PER_INCH) + error;
+                    newFrontRightTarget = robot.fRMotor.getCurrentPosition() + (int)(inches * COUNTS_PER_INCH) - error;
+                    newBackLeftTarget = robot.bLMotor.getCurrentPosition() + (int)(inches * COUNTS_PER_INCH) - error;
+                    newBackRightTarget = robot.bRMotor.getCurrentPosition() - (int)(inches * COUNTS_PER_INCH) + error;
+                    robot.fLMotor.setTargetPosition(newFrontLeftTarget);
+                    robot.fRMotor.setTargetPosition(newFrontRightTarget);
+                    robot.bLMotor.setTargetPosition(newBackLeftTarget);
+                    robot.bRMotor.setTargetPosition(newBackRightTarget);
+                    break;
+                case 'r':
+                    newFrontLeftTarget = robot.fLMotor.getCurrentPosition() + (int)(inches * COUNTS_PER_INCH) - error;
+                    newFrontRightTarget = robot.fRMotor.getCurrentPosition() - (int)(inches * COUNTS_PER_INCH) + error;
+                    newBackLeftTarget = robot.bLMotor.getCurrentPosition() - (int)(inches * COUNTS_PER_INCH) + error;
+                    newBackRightTarget = robot.bRMotor.getCurrentPosition() + (int)(inches * COUNTS_PER_INCH) - error;
+                    robot.fLMotor.setTargetPosition(newFrontLeftTarget);
+                    robot.fRMotor.setTargetPosition(newFrontRightTarget);
+                    robot.bLMotor.setTargetPosition(newBackLeftTarget);
+                    robot.bRMotor.setTargetPosition(newBackRightTarget);
+                    break;
+                default:
+                    directionIsTrue = false;
+            }
+            // Determine new target position, and pass to motor controller
+
+            // Turn On RUN_TO_POSITION
+            robot.fLMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.fRMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.bLMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.bRMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+            // reset the timeout time and start motion.
+            runtime.reset();
+            if (directionIsTrue) {
+                robot.fLMotor.setPower(Math.abs(speed));
+                robot.fRMotor.setPower(Math.abs(speed));
+                robot.bLMotor.setPower(Math.abs(speed));
+                robot.bRMotor.setPower(Math.abs(speed));
+            }
+
+            // keep looping while we are still active, and there is time left, and both motors are running.
+            // Note: We use (isBusy() && isBusy()) in the loop test, which means that when EITHER motor hits
+            // its target position, the motion will stop.  This is "safer" in the event that the robot will
+            // always end the motion as soon as possible.
+            // However, if you require that BOTH motors have finished their moves before the robot continues
+            // onto the next step, use (isBusy() || isBusy()) in the loop test.
+            while (opModeIsActive() &&
+                    (directionIsTrue) &&
+                    (runtime.seconds() < timeoutS) &&
+                    (robot.fLMotor.isBusy() && robot.fRMotor.isBusy() && robot.bLMotor.isBusy() && robot.bRMotor.isBusy())) {
+
+                // Display it for the driver.
+                telemetry.addData("Target Positions",  "Running to fL: %7d fR: %7d bL: %7d bR: %7d",
+                        newFrontLeftTarget,
+                        newFrontRightTarget,
+                        newBackLeftTarget,
+                        newBackRightTarget);
+                telemetry.addData("Current Positions",  "Running at fL: %7d fR: %7d bL: %7d bR: %7d",
+                        robot.fLMotor.getCurrentPosition(),
+                        robot.fRMotor.getCurrentPosition(),
+                        robot.bLMotor.getCurrentPosition(),
+                        robot.bRMotor.getCurrentPosition());
+                telemetry.update();
+
+                if (Math.abs(newFrontLeftTarget - robot.fLMotor.getCurrentPosition()) < 50 ||
+                        Math.abs(newFrontRightTarget - robot.fRMotor.getCurrentPosition()) < 50 ||
+                        Math.abs(newBackLeftTarget - robot.bLMotor.getCurrentPosition()) < 50 ||
+                        Math.abs(newBackRightTarget - robot.bRMotor.getCurrentPosition()) < 50) {
+                    break;
+                }
+            }
+
+            // Stop all motion;
+            robot.fLMotor.setPower(0);
+            robot.fRMotor.setPower(0);
+            robot.bLMotor.setPower(0);
+            robot.bRMotor.setPower(0);
+
+            // Turn off RUN_TO_POSITIOn
+
+            robot.fLMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.fRMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.bRMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.bLMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+
+
+            sleep(500);   // optional pause after each move
+        }
+    }
+    public int getErrorEncoder(double speed) { //me being stupid
+        return (int) (speed * 200);
     }
 }
