@@ -82,8 +82,8 @@ public class Hardware
         bRMotor.setDirection(DcMotor.Direction.REVERSE);//REV
         launcherMotor.setDirection(DcMotor.Direction.FORWARD);//FORWARD
 
-        launcherServo.scaleRange(0, 0.6);
+        launcherServo.scaleRange(0, 0.3);
 
-        launcherServo.setPosition(1);
+        launcherServo.setPosition(0);
     }
 }
