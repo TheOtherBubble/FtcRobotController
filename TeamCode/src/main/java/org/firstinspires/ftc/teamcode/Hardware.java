@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -16,6 +17,10 @@ public class Hardware
     public DcMotor fRMotor;
     public DcMotor bLMotor;
     public DcMotor bRMotor;
+
+    public DcMotor launcherMotor;
+
+    public Servo launcherServo;
 
     //declaring values for use with encoders
     static final double     COUNTS_PER_MOTOR_REV    = 1120 ;    // AndyMark Motor Encoder
@@ -40,29 +45,45 @@ public class Hardware
         bRMotor = hwMap.get(DcMotor.class, "bRMotor");
         bLMotor = hwMap.get(DcMotor.class, "bLMotor");
 
+        launcherMotor = hwMap.get(DcMotor.class, "launcherMotor");
+
+        launcherServo = hwMap.get(Servo.class, "launcherServo");
+
         fLMotor.setPower(0);
         bLMotor.setPower(0);
         fRMotor.setPower(0);
         bRMotor.setPower(0);
 
+        launcherMotor.setPower(0);
+
 
         // Set all motors to run without encoders.
         // May want to use RUN_USING_ENCODERS if encoders are installed.
-        fLMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        fRMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        bLMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        bRMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
+//        fLMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        fRMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        bLMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        bRMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        fLMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        fRMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        bLMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        bRMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        launcherMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         fLMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         bLMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         fRMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         bRMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        launcherMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
 
-        fLMotor.setDirection(DcMotor.Direction.REVERSE);
-        fRMotor.setDirection(DcMotor.Direction.FORWARD);
-        bLMotor.setDirection(DcMotor.Direction.REVERSE);
-        bRMotor.setDirection(DcMotor.Direction.FORWARD);
+        fLMotor.setDirection(DcMotor.Direction.FORWARD);//for
+        fRMotor.setDirection(DcMotor.Direction.REVERSE);//rev
+        bLMotor.setDirection(DcMotor.Direction.FORWARD);//for
+        bRMotor.setDirection(DcMotor.Direction.REVERSE);//REV
+        launcherMotor.setDirection(DcMotor.Direction.FORWARD);//FORWARD
+
+        launcherServo.scaleRange(0, 0.3);
+
+        launcherServo.setPosition(0);
     }
 }

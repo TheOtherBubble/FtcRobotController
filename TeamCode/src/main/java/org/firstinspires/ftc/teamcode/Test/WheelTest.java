@@ -19,8 +19,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 import org.firstinspires.ftc.teamcode.AutonDriving;
 import org.firstinspires.ftc.teamcode.Hardware;
 
-@Autonomous(name="WheelTest", group="Test")
-@Disabled
+@Autonomous(name="WheelTest", group="GyroAuton")
+//@Disabled
 public class WheelTest extends LinearOpMode {
 
     /* Declare OpMode members. */

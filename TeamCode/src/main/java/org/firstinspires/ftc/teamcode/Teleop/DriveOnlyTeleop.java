@@ -25,6 +25,8 @@ public class DriveOnlyTeleop extends OpMode {
         //Initialize the hardware variables.
         //The init() method of the hardware class does all the work here
         robot.init(hardwareMap);
+
+
     }
 
     @Override
@@ -51,5 +53,10 @@ public class DriveOnlyTeleop extends OpMode {
         robot.fRMotor.setPower(-drive * v2);
         robot.bLMotor.setPower(-drive * v3);
         robot.bRMotor.setPower(-drive * v4);
+
+        telemetry.addData("fLPower", -drive * v1);
+        telemetry.addData("fRPower", -drive * v2);
+        telemetry.addData("bLPower", -drive * v3);
+        telemetry.addData("bRPower", -drive * v4);
     }
 }

@@ -7,11 +7,11 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 //import org.firstinspires.ftc.teamcode.src.main.java.org.firstinspires.ftc.teamcode.DriveOnlyHardware;
 
 
-@TeleOp(name="DriveOnlyTeleop", group="Test")
+@TeleOp(name="DriveOnlyTeleopLegacy", group="Test")
 
 @Disabled
 
-public class DriveOnlyTeleop extends OpMode {
+public class DriveOnlyTeleopLegacy extends OpMode {
 
     DustBowlRefugeeHardware robot = new DustBowlRefugeeHardware();
 
