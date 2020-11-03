@@ -871,7 +871,7 @@ public class AutonDriving extends LinearOpMode {
         }
     }*/
 
-    public void strafe (int iterations, double speed, boolean isRight, double balanceReduction, double milliseconds, double moreBalance)
+    public void strafe (int iterations, double speed, boolean isRight, double balanceReduction, double milliseconds, double moreBalance, double Angle)
     {
         //balance reduction: add to this if the back of the robot is faster than the front, subtract for opposite
         //more balance: add to this if the robot is driving slightly backwards, subtract for opposite
@@ -962,7 +962,17 @@ public class AutonDriving extends LinearOpMode {
 
                 }
 
+                //slow down bc jerk causes drift and turning
+                double inc = .85;
+                for(int j = 0; j < 15; j++)
+                {
+                    robot.fLMotor.setPower(robot.fLMotor.getPower()*inc);
+                    robot.fRMotor.setPower(robot.fRMotor.getPower()*inc);
+                    robot.bLMotor.setPower(robot.bLMotor.getPower()*inc);
+                    robot.bRMotor.setPower(robot.bRMotor.getPower()*inc);
+                }
                 normalDrive(0, 0); // stops it after 1 second
+                turnToPosition(Angle, "z", turnSpeed, 500, false);
                 //turnToPosition(-angle, "z", turnSpeed, 4); //corrects at the end of each motion set
                 sleep(300);
                 //telemetry.addData("Target", "%7d:%7d:%7d:%7d", fLTarget, fRTarget, bLTarget, bRTarget);
