@@ -43,7 +43,7 @@ import org.firstinspires.ftc.teamcode.Hardware;
 
 import java.util.List;
 
-@Autonomous(name="Auton Vision Test", group="FullAuton")
+@Autonomous(name="Test Auton", group="FullAuton")
 //@Disabled
 public class TestAuton extends AutonDriving {
 

@@ -5,7 +5,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 import org.firstinspires.ftc.teamcode.AutonDrivingWIP;
 
-@Autonomous(name="TestAuton", group="GyroAuton")
+@Autonomous(name="TestAutonWIP", group="GyroAuton")
 public class TestAutonWIP extends AutonDrivingWIP {
 //TESTING CLASS DO NOT USE
     @Override

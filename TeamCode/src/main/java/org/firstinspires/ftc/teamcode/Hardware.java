@@ -22,6 +22,8 @@ public class Hardware
 
     public Servo launcherServo;
 
+    public DcMotor intakeMotor;
+
     //declaring values for use with encoders
     static final double     COUNTS_PER_MOTOR_REV    = 1120 ;    // AndyMark Motor Encoder
     static final double     DRIVE_GEAR_REDUCTION    = 1.0;     // This is < 1.0 if geared UP
@@ -49,10 +51,13 @@ public class Hardware
 
         launcherServo = hwMap.get(Servo.class, "launcherServo");
 
+        intakeMotor = hwMap.get(DcMotor.class, "intakeMotor");
+
         fLMotor.setPower(0);
         bLMotor.setPower(0);
         fRMotor.setPower(0);
         bRMotor.setPower(0);
+        intakeMotor.setPower(0);
 
         launcherMotor.setPower(0);
 
@@ -68,12 +73,14 @@ public class Hardware
         bLMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         bRMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         launcherMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        intakeMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         fLMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         bLMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         fRMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         bRMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         launcherMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        intakeMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
 
         fLMotor.setDirection(DcMotor.Direction.FORWARD);//for
@@ -81,6 +88,7 @@ public class Hardware
         bLMotor.setDirection(DcMotor.Direction.FORWARD);//for
         bRMotor.setDirection(DcMotor.Direction.REVERSE);//REV
         launcherMotor.setDirection(DcMotor.Direction.FORWARD);//FORWARD
+        intakeMotor.setDirection(DcMotor.Direction.FORWARD);
 
         launcherServo.scaleRange(0, 0.3);
 

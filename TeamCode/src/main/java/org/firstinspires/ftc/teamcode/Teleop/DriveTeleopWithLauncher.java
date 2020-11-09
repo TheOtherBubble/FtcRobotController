@@ -148,6 +148,19 @@ public class DriveTeleopWithLauncher extends OpMode {
             robot.launcherMotor.setPower(0);
         }
 
+        if(gamepad1.y)
+        {
+            robot.intakeMotor.setPower(1);
+        }
+        else if(gamepad1.x)
+        {
+            robot.intakeMotor.setPower(-1);
+        }
+        else
+        {
+            robot.intakeMotor.setPower(0);
+        }
+
         if(gamepad1.dpad_up)
         {
             ResetVuforiaValues();
