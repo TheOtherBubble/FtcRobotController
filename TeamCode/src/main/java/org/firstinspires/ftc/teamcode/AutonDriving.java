@@ -40,7 +40,7 @@ public class AutonDriving extends LinearOpMode {
 
     /* Declare OpMode members. */
     public Hardware robot = new Hardware();
-    private ElapsedTime runtime = new ElapsedTime();
+    public ElapsedTime runtime = new ElapsedTime();
     public String xyz = "z";
     //CONTAINS ALL METHODS AND VARIABlES TO BE EXTENDED BY OTHER AUTON CLASSES
     static final double     COUNTS_PER_MOTOR_REV = 537.6;    // Currently: Andymark Neverest 20
@@ -124,8 +124,12 @@ public class AutonDriving extends LinearOpMode {
     public double EAST = 90;
     public double WEST = -90;
 
-    public double rightBal = .1;
-    public double leftBal = .07;
+    public double rightBalRed = .08; //.1
+    public double leftBalRed = .05;
+    public double leftMoreBal = .4;
+    public double rightMoreBal = .4;
+
+    public double strafeSpeed = .8;
 
     public double clawPos = .35;
 
@@ -252,20 +256,20 @@ public class AutonDriving extends LinearOpMode {
     }
 
 
-    /*public void turnToPosition (double target, String xyz, double topPower, double timeoutS) {
+    public void turnToPosition (double target, String xyz, double topPower, double timeoutS) {
         //stopAndReset();
         target*= -1;
-        double originalAngle = readAngle(xyz);
+        double originalAngle = readAngle("z");
 
         //wild
-        if (target > 0)
+        /*if (target > 0)
         {
             target -= degreeError;
         }
         else
         {
             target += degreeError;
-        }
+        }*/
         //telemetry.addData("hello", "1");
         //telemetry.update();
 
@@ -278,13 +282,13 @@ public class AutonDriving extends LinearOpMode {
             //telemetry.addData("hello", "2");
             //sleep(1000);
             //telemetry.update();
-            angle = readAngle(xyz);
+            angle = readAngle("z");
             error = angle - target;
             powerScaled = topPower * Math.abs(error / 180) * pidMultiplierTurning(error);
-            if(error < 6)
+            /*if(error < 6)
             {
                 powerScaled += gyroTurnBoost;
-            }
+            }*/
 
             //double powerScaled = power*pidMultiplier(error);
 
@@ -305,7 +309,7 @@ public class AutonDriving extends LinearOpMode {
         normalDrive(0, 0);
         //stopAndReset();
         updateAngles();
-    }*/
+    }
 
     public void turnDegrees (double degrees, String xyz, double topPower, double timeoutS) {
         //stopAndReset();
@@ -385,7 +389,7 @@ public class AutonDriving extends LinearOpMode {
         {
             degrees += degreeError;
         }
-        else
+        else if(degrees > 0)
         {
             degrees -= degreeError;
         }
@@ -920,8 +924,8 @@ public class AutonDriving extends LinearOpMode {
                     {
                         bRSpeed -= balanceReduction;
                         fLSpeed += balanceReduction;
-                        fRSpeed += balanceReduction;
-                        bLSpeed -= balanceReduction;
+                        fRSpeed += balanceReduction - moreBalance;
+                        bLSpeed -= balanceReduction - moreBalance;
 
                         bLSpeed *= -1;
                         fRSpeed *= -1;
@@ -972,7 +976,7 @@ public class AutonDriving extends LinearOpMode {
                     robot.bRMotor.setPower(robot.bRMotor.getPower()*inc);
                 }
                 normalDrive(0, 0); // stops it after 1 second
-                turnToPosition(Angle, "z", turnSpeed, 500, false);
+                turnToPosition(Angle, "z", turnSpeed-.05, 500, false);
                 //turnToPosition(-angle, "z", turnSpeed, 4); //corrects at the end of each motion set
                 sleep(300);
                 //telemetry.addData("Target", "%7d:%7d:%7d:%7d", fLTarget, fRTarget, bLTarget, bRTarget);

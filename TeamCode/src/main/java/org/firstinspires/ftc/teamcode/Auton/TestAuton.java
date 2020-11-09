@@ -1,117 +1,86 @@
+/* Copyright (c) 2017 FIRST. All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without modification,
+ * are permitted (subject to the limitations in the disclaimer below) provided that
+ * the following conditions are met:
+ *
+ * Redistributions of source code must retain the above copyright notice, this list
+ * of conditions and the following disclaimer.
+ *
+ * Redistributions in binary form must reproduce the above copyright notice, this
+ * list of conditions and the following disclaimer in the documentation and/or
+ * other materials provided with the distribution.
+ *
+ * Neither the name of FIRST nor the names of its contributors may be used to endorse or
+ * promote products derived from this software without specific prior written permission.
+ *
+ * NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS
+ * LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+ * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
 package org.firstinspires.ftc.teamcode.Auton;
 
-import android.database.sqlite.SQLiteException;
-
-import com.qualcomm.hardware.bosch.BNO055IMU;
-import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
-import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
-import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
-import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
-import org.firstinspires.ftc.robotcore.external.navigation.Position;
-import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
-//import org.firstinspires.ftc.teamcode.src.main.java.org.firstinspires.ftc.teamcode.Auton.AutonDrivingDustBowlRefugee;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
-import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
-import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
-import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
+import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
+import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 import org.firstinspires.ftc.teamcode.AutonDriving;
+import org.firstinspires.ftc.teamcode.Hardware;
 
-
-import java.util.ArrayList;
 import java.util.List;
 
-import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.DEGREES;
-import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.XYZ;
-import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.YZX;
-import static org.firstinspires.ftc.robotcore.external.navigation.AxesReference.EXTRINSIC;
-import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.CameraDirection.BACK;
-
+@Autonomous(name="Auton Vision Test", group="FullAuton")
 //@Disabled
-@Autonomous(name="TestAuton", group="GyroAuton")
 public class TestAuton extends AutonDriving {
-//    AutonDrivingDriveOnly auton = new AutonDrivingDriveOnly();
 
-    //SkyStoneHardwareDrivingOnly robot = new SkyStoneHardwareDrivingOnly();
+    /* Declare OpMode members. */
+    Hardware robot = new Hardware();   // Use a Pushbot's hardware
+    private ElapsedTime     runtime = new ElapsedTime();
+
+    static final double     FORWARD_SPEED = 0.4;
+
+    private boolean objectInVision = false;
+
+    private static final String TFOD_MODEL_ASSET = "UltimateGoal.tflite";
+    private static final String LABEL_FIRST_ELEMENT = "Quad";
+    private static final String LABEL_SECOND_ELEMENT = "Single";
+
+    private VuforiaLocalizer vuforia;
+
+    private TFObjectDetector tfod;
+
+    private String ringLabel = " ";
+
+    public static final String VUFORIA_KEY =
+            "AYy6NYn/////AAABmTW3q+TyLUMbg/IXWlIG3BkMMq0okH0hLmwj3CxhPhvUlEZHaOAmESqfePJ57KC2g6UdWLN7OYvc8ihGAZSUJ2JPWAsHQGv6GUAj4BlrMCjHvqhY0w3tV/Azw2wlPmls4FcUCRTzidzVEDy+dtxqQ7U5ZtiQhjBZetAcnLsCYb58dgwZEjTx2+36jiqcFYvS+FlNJBpbwmnPUyEEb32YBBZj4ra5jB0v4IW4wYYRKTNijAQKxco33VYSCbH0at99SqhXECURA55dtmmJxYpFlT/sMmj0iblOqoG/auapQmmyEEXt/T8hv9StyirabxhbVVSe7fPsAueiXOWVm0kCPO+KN/TyWYB9Hg/mSfnNu9i9";
+
+    public TestAuton() {
+    }
+
     @Override
     public void runOpMode() {
 
-        //init
         robot.init(hardwareMap);
-        BNO055IMU.Parameters p = new BNO055IMU.Parameters();
-        p.angleUnit = BNO055IMU.AngleUnit.DEGREES;
-        p.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-        p.calibrationDataFile = "BNO055IMUCalibration.json";
-        p.loggingEnabled = true;
-        p.loggingTag = "IMU";
-        p.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
-        imu = hardwareMap.get(BNO055IMU.class, "imu");
-        imu.initialize(p);
-
-        //side motors
-        robot.fLMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        robot.fRMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
-        robot.fLMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        robot.fRMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-        //lateral motors
-        robot.bLMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        robot.bRMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
-        robot.bLMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        robot.bRMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-        /*
-         * Configure Vuforia by creating a Parameter object, and passing it to the Vuforia engine.
-         * We can pass Vuforia the handle to a camera preview resource (on the RC phone);
-         * If no camera monitor is desired, use the parameter-less constructor instead (commented out below).
-         */
-      /*  int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(cameraMonitorViewId);
-
-        // VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
-
-        parameters.vuforiaLicenseKey = VUFORIA_KEY;
-        parameters.cameraDirection   = CAMERA_CHOICE;
-
-        //  Instantiate the Vuforia engine
-        vuforia = ClassFactory.getInstance().createVuforia(parameters);
-
-        // Load the data sets for the trackable objects. These particular data
-        // sets are stored in the 'assets' part of our application.
-        VuforiaTrackables targetsSkyStone = this.vuforia.loadTrackablesFromAsset("Skystone");
-
-        VuforiaTrackable stoneTarget = targetsSkyStone.get(0);
-        stoneTarget.setName("Stone Target");
-
-
-        // For convenience, gather together all the trackable objects in one easily-iterable collection */
-        /*List<VuforiaTrackable> allTrackables = new ArrayList<VuforiaTrackable>();
-        allTrackables.addAll(targetsSkyStone);
-
-        stoneTarget.setLocation(OpenGLMatrix
-                .translation(0, 0, stoneZ)
-                .multiplied(Orientation.getRotationMatrix(EXTRINSIC, XYZ, DEGREES, 90, 0, -90)));*/
 
         waitForStart();
 
+        strafe(1, strafeSpeed, right, rightBalRed, 500, rightMoreBal, NORTH); //strafe template
+        //works with 200ms, 300ms, 500ms, does not work at 800ms other vals have not been tested
+        strafe(1, strafeSpeed, left, leftBalRed, 500, leftMoreBal, NORTH); //ending turntoposition is sus
 
-
-
-
-
-        imu.startAccelerationIntegration(new Position(), new Velocity(), 1000);
-        startAngle = readAngle("z");
-        setDir();
-
-        strafe(1, .8, left, .05, 200, .4, NORTH);
-        //turnToPosition(NORTH, "z", turnSpeed, 500, false);
-
-
-        pathComplete(500);
     }
 }
