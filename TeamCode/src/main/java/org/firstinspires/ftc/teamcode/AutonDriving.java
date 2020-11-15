@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
+import com.vuforia.EyewearDevice;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -100,7 +101,7 @@ public class AutonDriving extends LinearOpMode {
 
 
     //gyro drive variables
-    public double gyroDriveThreshold = .7;
+    public double gyroDriveThreshold = 10;
     public double gyroDriveSpeedSlow = .27;
     public double gyroDriveSpeed = .32;
     public double gyroDriveSpeedFast = .35;
@@ -115,7 +116,7 @@ public class AutonDriving extends LinearOpMode {
     private double gyroTurnThreshold = .7;
     private double degreeError = 2;
     public double slowTurnSpeed = .5;
-    public double turnSpeed = .7;
+    public double turnSpeed = .3;
     public double axisTurnSpeed = 1;
     private double gyroTurnBoost = .07;
 
@@ -256,60 +257,60 @@ public class AutonDriving extends LinearOpMode {
     }
 
 
-    public void turnToPosition (double target, String xyz, double topPower, double timeoutS) {
-        //stopAndReset();
-        target*= -1;
-        double originalAngle = readAngle("z");
-
-        //wild
-        /*if (target > 0)
-        {
-            target -= degreeError;
-        }
-        else
-        {
-            target += degreeError;
-        }*/
-        //telemetry.addData("hello", "1");
-        //telemetry.update();
-
-        runtime.reset();
-
-        double angle; //variable for gyro correction around z axis
-        double error;
-        double powerScaled;
-        do {
-            //telemetry.addData("hello", "2");
-            //sleep(1000);
-            //telemetry.update();
-            angle = readAngle("z");
-            error = angle - target;
-            powerScaled = topPower * Math.abs(error / 180) * pidMultiplierTurning(error);
-            /*if(error < 6)
-            {
-                powerScaled += gyroTurnBoost;
-            }*/
-
-            //double powerScaled = power*pidMultiplier(error);
-
-            if (error > 0)
-            {
-                normalDrive(powerScaled, -powerScaled);
-            }
-            else if (error < 0)
-            {
-                normalDrive(-powerScaled, powerScaled);
-            }
-            telemetry.addData("original angle", originalAngle);
-            telemetry.addData("current angle", angle);
-            telemetry.addData("error", error);
-            telemetry.addData("target", target);
-            telemetry.update();
-        } while (opModeIsActive() && (Math.abs(error) > gyroTurnThreshold) && (runtime.seconds() < timeoutS));
-        normalDrive(0, 0);
-        //stopAndReset();
-        updateAngles();
-    }
+//    public void turnToPosition (double target, String xyz, double topPower, double timeoutS) {
+//        //stopAndReset();
+//        target*= -1;
+//        double originalAngle = readAngle("z");
+//
+//        //wild
+//        /*if (target > 0)
+//        {
+//            target -= degreeError;
+//        }
+//        else
+//        {
+//            target += degreeError;
+//        }*/
+//        //telemetry.addData("hello", "1");
+//        //telemetry.update();
+//
+//        runtime.reset();
+//
+//        double angle; //variable for gyro correction around z axis
+//        double error;
+//        double powerScaled;
+//        do {
+//            //telemetry.addData("hello", "2");
+//            //sleep(1000);
+//            //telemetry.update();
+//            angle = readAngle("z");
+//            error = angle - target;
+//            powerScaled = topPower * Math.abs(error / 180) * pidMultiplierTurning(error);
+//            /*if(error < 6)
+//            {
+//                powerScaled += gyroTurnBoost;
+//            }*/
+//
+//            //double powerScaled = power*pidMultiplier(error);
+//
+//            if (error > 0)
+//            {
+//                normalDrive(powerScaled, -powerScaled);
+//            }
+//            else if (error < 0)
+//            {
+//                normalDrive(-powerScaled, powerScaled);
+//            }
+//            telemetry.addData("original angle", originalAngle);
+//            telemetry.addData("current angle", angle);
+//            telemetry.addData("error", error);
+//            telemetry.addData("target", target);
+//            telemetry.update();
+//        } while (opModeIsActive() && (Math.abs(error) > gyroTurnThreshold) && (runtime.seconds() < timeoutS));
+//        normalDrive(0, 0);
+//        //stopAndReset();
+//        updateAngles();
+//    }
 
     public void turnDegrees (double degrees, String xyz, double topPower, double timeoutS) {
         //stopAndReset();
@@ -374,25 +375,20 @@ public class AutonDriving extends LinearOpMode {
 
                 normalDrive(powerScaled, -powerScaled);
             }
-        } while (opModeIsActive() && (Math.abs(error) > gyroTurnThreshold) && (runtime.seconds() < timeoutS));
+        } while (opModeIsActive() && (Math.abs(error) > 10) && (Math.abs(degrees - degreesTurned) > 10) && (runtime.seconds() < timeoutS));
         normalDrive(0, 0);
         //stopAndReset();
+
+        sleep(300);
+
         updateAngles();
 
     }
 
     public void turnToPosition (double degrees, String xyz, double topPower, double timeoutS, boolean fast) {
-        //stopAndReset();
-
+        //stopAndReset();\
         degrees *= -1;
-        if(degrees < 0)
-        {
-            degrees += degreeError;
-        }
-        else if(degrees > 0)
-        {
-            degrees -= degreeError;
-        }
+
         double originalAngle = readAngle(xyz);
 
         double target = degrees;
@@ -406,31 +402,37 @@ public class AutonDriving extends LinearOpMode {
         runtime.reset();
 
         double angle = readAngle(xyz); //variable for gyro correction around z axis
-        double error = angle - target;
+        double error = target - angle;
         double powerScaled = topPower;
         double degreesTurned;
+        telemetry.addData("original angle", originalAngle);
+        telemetry.addData("current angle", readAngle(xyz));
+        telemetry.addData("error", error);
+        telemetry.addData("target", target);
+        telemetry.update();
+        sleep(1500);
         do {
             //telemetry.addData("hello", "2");
             //sleep(1000);
             //telemetry.update();
             angle = readAngle(xyz);
-            error = angle - target;
+            error = target - angle;
             degreesTurned = angle - originalAngle;
 
             //things to make the turn faster at the beginning and end so it doesn't slow down to basically a stop
-            if(!fast)
-            {
-                powerScaled = topPower * Math.abs(error/180) * pidMultiplierTurning(error);
-            }
-            else
-            {
-                powerScaled = topPower * Math.abs(error/90) * pidMultiplierTurning(error);
-            }
-            if(error < 6)
+//            if(!fast)
+//            {
+//                powerScaled = topPower * Math.abs(error/180) * pidMultiplierTurning(error);
+//            }
+//            else
+//            {
+//                powerScaled = topPower * Math.abs(error/90) * pidMultiplierTurning(error);
+//            }
+            if(Math.abs(error) > 10)
             {
                 powerScaled += gyroTurnBoost;
             }
-            else if (Math.abs(degreesTurned) < 6)
+            else if (Math.abs(degreesTurned) < 10)
             {
                 powerScaled += gyroTurnBoost;
             }
@@ -451,86 +453,87 @@ public class AutonDriving extends LinearOpMode {
 
                 normalDrive(-powerScaled, powerScaled);
             }
-        } while (opModeIsActive() && (Math.abs(error) > gyroTurnThreshold) && (runtime.seconds() < timeoutS));
+        } while (opModeIsActive() && (Math.abs(error) > 15) && (runtime.seconds() < timeoutS));
+
         normalDrive(0, 0);
         //stopAndReset();
         updateAngles();
 
     }
 
-    public void turnToPosition (double degrees, String xyz, double topPower, double timeoutS, boolean fast, boolean clock) {
-        //stopAndReset();
-
-        //forced direction turn to position in case the direction handling doesn't work
-        degrees *= -1;
-        if(degrees < 0)
-        {
-            degrees += degreeError;
-        }
-        else
-        {
-            degrees -= degreeError;
-        }
-        double originalAngle = readAngle(xyz);
-
-        double target = degrees;
-
-        //wild
-
-
-        //telemetry.addData("hello", "1");
-        //telemetry.update();
-
-        runtime.reset();
-
-        double angle = readAngle(xyz); //variable for gyro correction around z axis
-        double error = target - angle;
-        double powerScaled = topPower;
-        double degreesTurned;
-        do {
-            //telemetry.addData("hello", "2");
-            //sleep(1000);
-            //telemetry.update();
-            angle = readAngle(xyz);
-            error = angle - target;
-            degreesTurned = angle - originalAngle;
-
-            //adds boosts in certain places to make the turn faster
-            if(!fast)
-            {
-                powerScaled = topPower * Math.abs(error/180) * pidMultiplierTurning(error);
-            }
-            else
-            {
-                powerScaled = topPower * Math.abs(error/90) * pidMultiplierTurning(error);
-            }
-            if(error < 6)
-            {
-                powerScaled += gyroTurnBoost;
-            }
-            else if (Math.abs(degreesTurned) < 6)
-            {
-                powerScaled += gyroTurnBoost;
-            }
-
-            //double powerScaled = power*pidMultiplier(error);
-            telemetry.addData("original angle", originalAngle);
-            telemetry.addData("current angle", readAngle(xyz));
-            telemetry.addData("error", error);
-            telemetry.addData("target", target);
-            //telemetry.addData("degrees", degrees);
-            telemetry.update();
-                //normalDrive(powerScaled, -powerScaled);
-
-            if(clock)
-                normalDrive(powerScaled, -powerScaled);
-            else normalDrive(-powerScaled, powerScaled);
-        } while (opModeIsActive() && (Math.abs(error) > gyroTurnThreshold) && (runtime.seconds() < timeoutS));
-        normalDrive(0, 0);
-        //stopAndReset();
-        updateAngles();
-
-    }
+//    public void turnToPosition (double degrees, String xyz, double topPower, double timeoutS, boolean fast, boolean clock) {
+//        //stopAndReset();
+//
+//        //forced direction turn to position in case the direction handling doesn't work
+//        degrees *= -1;
+//        if(degrees < 0)
+//        {
+//            degrees += degreeError;
+//        }
+//        else
+//        {
+//            degrees -= degreeError;
+//        }
+//        double originalAngle = readAngle(xyz);
+//
+//        double target = degrees;
+//
+//        //wild
+//
+//
+//        //telemetry.addData("hello", "1");
+//        //telemetry.update();
+//
+//        runtime.reset();
+//
+//        double angle = readAngle(xyz); //variable for gyro correction around z axis
+//        double error = target - angle;
+//        double powerScaled = topPower;
+//        double degreesTurned;
+//        do {
+//            //telemetry.addData("hello", "2");
+//            //sleep(1000);
+//            //telemetry.update();
+//            angle = readAngle(xyz);
+//            error = angle - target;
+//            degreesTurned = angle - originalAngle;
+//
+//            //adds boosts in certain places to make the turn faster
+//            if(!fast)
+//            {
+//                powerScaled = topPower * Math.abs(error/180) * pidMultiplierTurning(error);
+//            }
+//            else
+//            {
+//                powerScaled = topPower * Math.abs(error/90) * pidMultiplierTurning(error);
+//            }
+//            if(error < 6)
+//            {
+//                powerScaled += gyroTurnBoost;
+//            }
+//            else if (Math.abs(degreesTurned) < 6)
+//            {
+//                powerScaled += gyroTurnBoost;
+//            }
+//
+//            //double powerScaled = power*pidMultiplier(error);
+//            telemetry.addData("original angle", originalAngle);
+//            telemetry.addData("current angle", readAngle(xyz));
+//            telemetry.addData("error", error);
+//            telemetry.addData("target", target);
+//            //telemetry.addData("degrees", degrees);
+//            telemetry.update();
+//                //normalDrive(powerScaled, -powerScaled);
+//
+//            if(clock)
+//                normalDrive(powerScaled, -powerScaled);
+//            else normalDrive(-powerScaled, powerScaled);
+//        } while (opModeIsActive() && (Math.abs(error) > gyroTurnThreshold) && (runtime.seconds() < timeoutS));
+//        normalDrive(0, 0);
+//        //stopAndReset();
+//        updateAngles();
+//
+//    }
 
     public void axisTurn (double target, String xyz, double topPower, double timeoutS) {
         //stopAndReset();
@@ -631,7 +634,7 @@ public class AutonDriving extends LinearOpMode {
         } else {
             return 0;
         }
-    }
+}
 
     public void gyroDrive (double distance, double angle, boolean initBoost, double speed, double speedMult, double timeoutS)
     {

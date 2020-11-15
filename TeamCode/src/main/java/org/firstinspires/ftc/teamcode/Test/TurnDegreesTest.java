@@ -11,7 +11,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 import org.firstinspires.ftc.teamcode.AutonDriving;
 import org.firstinspires.ftc.teamcode.Hardware;
 
-@Disabled
+//@Disabled
 @Autonomous(name="TurnDegreesTest", group="GyroAuton")
 public class TurnDegreesTest extends AutonDriving {
 //    AutonDrivingDriveOnly auton = new AutonDrivingDriveOnly();
@@ -57,6 +57,10 @@ public class TurnDegreesTest extends AutonDriving {
         //line up with center foundation
         //gyroDrive(10, gyroDriveThreshold);
         turnDegrees(90, "z", turnSpeed, 10);
+
+        turnDegrees(90, "z", turnSpeed, 10);
+
+        turnDegrees(-90, "z", turnSpeed, 10);
 
         //sleep(5000);
 
