@@ -14,16 +14,15 @@ public class TestAutonWIP extends AutonDrivingWIP {
         //init
         robot.init(hardwareMap);
         initImu();
-        initVuforia(); //may not work unsure
+        //initVuforia(); //may not work unsure
         stopAndReset();
 
         waitForStart();
 
+        sleep(500);
         imu.startAccelerationIntegration(new Position(), new Velocity(), 1000);
 
-        vuforia(allTrackables, targetsUltimateGoal, 500); //may not work unsure
-
-        //probably some kind of vuforia error bc throws null pointer upon running
+        turnToPosition(-90, xyz, turnSpeed, 5000);
 
         pathComplete(500);
     }

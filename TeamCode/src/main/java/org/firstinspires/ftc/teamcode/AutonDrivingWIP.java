@@ -23,7 +23,10 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 
 import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.DEGREES;
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.XYZ;
@@ -34,12 +37,16 @@ import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocaliz
 //@Autonomous(name="AutonDrivingDriveOnly", group="AutonTesting")
 public class AutonDrivingWIP extends LinearOpMode {
 
-    /* Declare OpMode members. */
+    //
+    //OPMODE MEMBERS
     public Hardware robot = new Hardware();
     public ElapsedTime runtime = new ElapsedTime();
 
-    public String xyz = "z";
 
+
+    //
+    //MEASURING CONSTANTS
+    //
     static final double     COUNTS_PER_MOTOR_REV = 537.6;    // Currently: Andymark Neverest 20
     static final double     DRIVE_GEAR_REDUCTION = .4;    // This is < 1.0 if geared UP //On OUR CENTER MOTOR THE GEAR REDUCTION IS .5
     static final double     WHEEL_DIAMETER_INCHES = 2.95276;     // For figuring circumference
@@ -50,13 +57,11 @@ public class AutonDrivingWIP extends LinearOpMode {
     static final double     P_TURN_COEFF            = 0.1;     // Larger is more responsive, but also less stable
     static final double     P_DRIVE_COEFF           = 0.15;     // Larger is more responsive, but also less stable
 
-    //Gyro
-    public BNO055IMU imu;
-    public Orientation angles = new Orientation();
-    public Acceleration gravity;
-    BNO055IMU.Parameters p = new BNO055IMU.Parameters();
 
-    //Vuforia/TF things
+
+    //
+    //VUFORIA
+    //
     private static final VuforiaLocalizer.CameraDirection CAMERA_CHOICE = BACK;
     private static final boolean PHONE_IS_PORTRAIT = false  ;
     private static final String VUFORIA_KEY =
@@ -79,16 +84,185 @@ public class AutonDrivingWIP extends LinearOpMode {
     private float phoneYRotate    = 0;
     private float phoneZRotate    = 0;
 
-    public VuforiaTrackables targetsUltimateGoal;
-    public List<VuforiaTrackable> allTrackables;
+    public VuforiaTrackables targetsUltimateGoal = new VuforiaTrackables() {
+        @Override public void setName(String name) { }
+        @Override public String getName() { return null; }
+        @Override public void activate() { }
+        @Override public void deactivate() { }
+        @Override public VuforiaLocalizer getLocalizer() { return null; }
+        @Override public int size() { return 0; }
+        @Override public boolean isEmpty() { return false; }
+        @Override public boolean contains(Object o) { return false; }
+        @Override public Iterator<VuforiaTrackable> iterator() { return null; }
+        @Override public Object[] toArray() { return new Object[0]; }
+        @Override public <T> T[] toArray(T[] a) { return null; }
+        @Override public boolean add(VuforiaTrackable vuforiaTrackable) { return false; }
+        @Override public boolean remove(Object o) { return false; }
+        @Override public boolean containsAll(Collection<?> c) { return false; }
+        @Override public boolean addAll(Collection<? extends VuforiaTrackable> c) { return false; }
+        @Override public boolean addAll(int index, Collection<? extends VuforiaTrackable> c) { return false; }
+        @Override public boolean removeAll(Collection<?> c) { return false; }
+        @Override public boolean retainAll(Collection<?> c) { return false; }
+        @Override public void clear() { }
+        @Override public VuforiaTrackable get(int index) { return null; }
+        @Override public VuforiaTrackable set(int index, VuforiaTrackable element) { return null; }
+        @Override public void add(int index, VuforiaTrackable element) { }
+        @Override public VuforiaTrackable remove(int index) { return null; }
+        @Override public int indexOf(Object o) { return 0; }
+        @Override public int lastIndexOf(Object o) { return 0; }
+        @Override public ListIterator<VuforiaTrackable> listIterator() { return null; }
+        @Override public ListIterator<VuforiaTrackable> listIterator(int index) { return null; }
+        @Override public List<VuforiaTrackable> subList(int fromIndex, int toIndex) { return null; }
+    };
+    public List<VuforiaTrackable> allTrackables = new List<VuforiaTrackable>() {
+        @Override
+        public int size() {
+            return 0;
+        }
+
+        @Override
+        public boolean isEmpty() {
+            return false;
+        }
+
+        @Override
+        public boolean contains(Object o) {
+            return false;
+        }
+
+        @Override
+        public Iterator<VuforiaTrackable> iterator() {
+            return null;
+        }
+
+        @Override
+        public Object[] toArray() {
+            return new Object[0];
+        }
+
+        @Override
+        public <T> T[] toArray(T[] a) {
+            return null;
+        }
+
+        @Override
+        public boolean add(VuforiaTrackable vuforiaTrackable) {
+            return false;
+        }
+
+        @Override
+        public boolean remove(Object o) {
+            return false;
+        }
+
+        @Override
+        public boolean containsAll(Collection<?> c) {
+            return false;
+        }
+
+        @Override
+        public boolean addAll(Collection<? extends VuforiaTrackable> c) {
+            return false;
+        }
+
+        @Override
+        public boolean addAll(int index, Collection<? extends VuforiaTrackable> c) {
+            return false;
+        }
+
+        @Override
+        public boolean removeAll(Collection<?> c) {
+            return false;
+        }
+
+        @Override
+        public boolean retainAll(Collection<?> c) {
+            return false;
+        }
+
+        @Override
+        public void clear() {
+
+        }
+
+        @Override
+        public VuforiaTrackable get(int index) {
+            return null;
+        }
+
+        @Override
+        public VuforiaTrackable set(int index, VuforiaTrackable element) {
+            return null;
+        }
+
+        @Override
+        public void add(int index, VuforiaTrackable element) {
+
+        }
+
+        @Override
+        public VuforiaTrackable remove(int index) {
+            return null;
+        }
+
+        @Override
+        public int indexOf(Object o) {
+            return 0;
+        }
+
+        @Override
+        public int lastIndexOf(Object o) {
+            return 0;
+        }
+
+        @Override
+        public ListIterator<VuforiaTrackable> listIterator() {
+            return null;
+        }
+
+        @Override
+        public ListIterator<VuforiaTrackable> listIterator(int index) {
+            return null;
+        }
+
+        @Override
+        public List<VuforiaTrackable> subList(int fromIndex, int toIndex) {
+            return null;
+        }
+    };
+
+
+
+    //
+    //GYRO
+    //
+    public String xyz = "z";
+    public BNO055IMU imu;
+    public Orientation angles = new Orientation();
+    public Acceleration gravity;
+    BNO055IMU.Parameters p = new BNO055IMU.Parameters();
+
+    //GYRO CONSTANTS
+    //public
+    public double turnSpeed = .4;
+
+    //private
+    private double gyroTurnThreshold = .5;
+    private double gyroTurnModLeft = .025;
+    private double gyroTurnModRight = -.015;
 
     @Override
     public void runOpMode()
     {
+
     }
 
+    //
+    //INIT FUNCTIONS
+    //
     public void initVuforia()
     {
+        //TODO: FIX
         webcamName = hardwareMap.get(WebcamName.class, "Webcam 1");
 
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
@@ -111,6 +285,12 @@ public class AutonDrivingWIP extends LinearOpMode {
 
         // Load the data sets for the trackable objects. These particular data
         // sets are stored in the 'assets' part of our application.
+
+
+        telemetry.addData("Test", "1");
+        sleep(500);
+
+
         targetsUltimateGoal = this.vuforia.loadTrackablesFromAsset("UltimateGoal");
         VuforiaTrackable blueTowerGoalTarget = targetsUltimateGoal.get(0);
         blueTowerGoalTarget.setName("Blue Tower Goal Target");
@@ -122,6 +302,12 @@ public class AutonDrivingWIP extends LinearOpMode {
         blueAllianceTarget.setName("Blue Alliance Target");
         VuforiaTrackable frontWallTarget = targetsUltimateGoal.get(4);
         frontWallTarget.setName("Front Wall Target");
+
+
+
+        telemetry.addData("Test", "2");
+        sleep(500);
+
 
         // For convenience, gather together all the trackable objects in one easily-iterable collection */
         allTrackables.addAll(targetsUltimateGoal);
@@ -145,6 +331,11 @@ public class AutonDrivingWIP extends LinearOpMode {
         redTowerGoalTarget.setLocation(OpenGLMatrix
                 .translation(halfField, -quadField, mmTargetHeight)
                 .multiplied(Orientation.getRotationMatrix(EXTRINSIC, XYZ, DEGREES, 90, 0, -90)));
+
+        telemetry.addData("Test", "3");
+        sleep(500);
+
+
         if (CAMERA_CHOICE == BACK)
         {
             phoneYRotate = -90;
@@ -170,21 +361,46 @@ public class AutonDrivingWIP extends LinearOpMode {
                 .multiplied(Orientation.getRotationMatrix(EXTRINSIC, YZX, DEGREES, phoneYRotate, phoneZRotate, phoneXRotate));
 
         /**  Let all the trackable listeners know where the phone is.  */
-        for (VuforiaTrackable trackable : allTrackables) {
+
+
+        telemetry.addData("Test", "4");
+        sleep(500);
+
+
+        for (VuforiaTrackable trackable : allTrackables)
+        {
             ((VuforiaTrackableDefaultListener) trackable.getListener()).setPhoneInformation(robotFromCamera, parameters.cameraDirection);
         }
 
 
     }
 
+    public void initImu()
+    {
+        p.angleUnit = BNO055IMU.AngleUnit.DEGREES;
+        p.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+        p.calibrationDataFile = "BNO055IMUCalibration.json";
+        p.loggingEnabled = true;
+        p.loggingTag = "IMU";
+        p.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
+        imu = hardwareMap.get(BNO055IMU.class, "imu");
+        imu.initialize(p);
+    }
+
+    //
+    //VUFORIA
+    //
     public void vuforia(List<VuforiaTrackable> allTrackables, VuforiaTrackables targetsUltimateGoal, double timeoutS)
     {
+        //TODO: FIX
         runtime.reset();
         targetsUltimateGoal.activate();
         while (runtime.seconds() < timeoutS)
         {
 
             // check all the trackable targets to see which one (if any) is visible.
+            telemetry.addData("Test", "5");
+            sleep(100);
             targetVisible = false;
             for (VuforiaTrackable trackable : allTrackables)
             {
@@ -223,20 +439,70 @@ public class AutonDrivingWIP extends LinearOpMode {
             telemetry.update();
         }
 
+
+        telemetry.addData("Test", "6");
+        sleep(500);
+
+
         // Disable Tracking when we are done;
         targetsUltimateGoal.deactivate();
     }
 
-    public void initImu()
+    //
+    //GYRO
+    //
+    public void updateAngles()
     {
-        p.angleUnit = BNO055IMU.AngleUnit.DEGREES;
-        p.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-        p.calibrationDataFile = "BNO055IMUCalibration.json";
-        p.loggingEnabled = true;
-        p.loggingTag = "IMU";
-        p.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
-        imu = hardwareMap.get(BNO055IMU.class, "imu");
-        imu.initialize(p);
+        try
+        {
+            angles = imu.getAngularOrientation(AxesReference.EXTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        }
+        catch (NullPointerException e)
+        {
+            telemetry.addData("Null Pointer Exception", "true");
+        }
+    }
+
+    public double readAngle(String xyz)
+    {
+        Orientation angles;
+        Acceleration gravity;
+        angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        updateAngles();
+        if (xyz.equals("x"))
+        {
+            return angles.thirdAngle;
+        }
+        else if (xyz.equals("y"))
+        {
+            return angles.secondAngle;
+        }
+        else if (xyz.equals("z"))
+        {
+            return angles.firstAngle;
+        }
+        else
+        {
+            return 0;
+        }
+    }
+
+    //
+    //DRIVING
+    //
+    public void normalDrive(double lpower, double rpower)
+    {
+        if (opModeIsActive())
+        {
+            robot.fLMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.fRMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.bLMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.bRMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.fLMotor.setPower(lpower);
+            robot.fRMotor.setPower(rpower);
+            robot.bLMotor.setPower(lpower);
+            robot.bRMotor.setPower(rpower);
+        }
     }
 
     public void stopAndReset()
@@ -256,56 +522,88 @@ public class AutonDrivingWIP extends LinearOpMode {
         robot.bRMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
-    public void updateAngles()
-    {
-        try
-        {
-            angles = imu.getAngularOrientation(AxesReference.EXTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-        }
-        catch (NullPointerException e)
-        {
-            telemetry.addData("Null Pointer Exception", "true");
-        }
-    }
+    //
+    //TURNING
+    //
+    public void turnToPosition (double pos, String xyz, double topPower, double timeoutS) {
+        //COUNTER CLOCKWISE IS POSITIVE; CLOCKWISE IS NEGATIVE
+        //TODO: FIX RIGHT TURN
 
-    public void normalDrive(double lpower, double rpower)
-    {
+        stopAndReset();
+        double originalAngle = readAngle(xyz);
+        double target = pos;
 
-        if (opModeIsActive())
-        {
-            robot.fLMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            robot.fRMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            robot.bLMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            robot.bRMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            robot.fLMotor.setPower(lpower);
-            robot.fRMotor.setPower(rpower);
-            robot.bLMotor.setPower(lpower);
-            robot.bRMotor.setPower(rpower);
+        runtime.reset();
+
+        double angle = readAngle(xyz); //variable for gyro correction around z axis
+        double error = angle - target;
+        double powerScaled = topPower;
+        double degreesTurned;
+        do {
+            //salient values
+            angle = readAngle(xyz);
+            error = angle - target;
+            degreesTurned = angle - originalAngle;
+            powerScaled = topPower * Math.abs(error/90) * pidMultiplierTurning(error);
+
+            //prevents extreme slowing towards end of turn
+            if(-6 < error && error < 0)
+            {
+                powerScaled += gyroTurnModLeft;
+            }
+            else if (0 < error && error < 6)
+            {
+                powerScaled += gyroTurnModRight;
+            }
+
+            //telementry
+            telemetry.addData("original angle", originalAngle);
+            telemetry.addData("current angle", readAngle(xyz));
+            telemetry.addData("error", error);
+            telemetry.addData("degrees turned", degreesTurned);
+            telemetry.addData("target", target);
+            telemetry.update();
+
+            //direction handling
+            if (error > 0)
+            {
+                normalDrive(powerScaled, -powerScaled);
+            }
+            else if (error < 0)
+            {
+
+                normalDrive(-powerScaled, powerScaled);
+            }
+
+            updateAngles();
         }
-    }
+        while (opModeIsActive() && (Math.abs(error) > gyroTurnThreshold) && (runtime.seconds() < timeoutS));
 
-    public double readAngle(String xyz)
-    {
-        //Orientation angles;
-        Acceleration gravity;
-        //angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        //stop turning and reset for next action
+        normalDrive(0, 0);
+        stopAndReset();
         updateAngles();
-        if (xyz.equals("x"))
-        {
-            return angles.thirdAngle;
-        }
-        else if (xyz.equals("y"))
-        {
-            return angles.secondAngle;
-        }
-        else if (xyz.equals("z"))
-        {
-            return angles.firstAngle;
-        }
-        else
-        {
-            return 0;
-        }
+
+    }
+
+    public void turnDegrees(double degrees, String xyz, double topPower, double timeoutS)
+    {
+        //COUNTER CLOCKWISE IS POSITIVE; CLOCKWISE IS NEGATIVE
+        //TODO: TEST
+
+        double originalAngle = readAngle(xyz);
+        double angle = originalAngle + degrees;
+
+        turnToPosition(angle, xyz, topPower, timeoutS);
+    }
+
+    //
+    //MISC
+    //
+    public double pidMultiplierTurning(double error) {
+        //equation for power multiplier is x/sqrt(x^2 + C)
+        double C = .001;
+        return Math.abs(error / Math.sqrt((error * error) + C));
     }
 
     public void pathComplete(int millisec)
