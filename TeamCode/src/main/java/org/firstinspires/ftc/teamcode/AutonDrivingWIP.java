@@ -244,6 +244,7 @@ public class AutonDrivingWIP extends LinearOpMode {
     //GYRO CONSTANTS
     //public
     public double turnSpeed = .4;
+    public double smallTurnSpeed = .7;
 
     //private
     private double gyroTurnThreshold = .5;
@@ -700,8 +701,8 @@ public class AutonDrivingWIP extends LinearOpMode {
                 }*/
                 if(Math.abs(fLTarget - robot.fLMotor.getCurrentPosition()) < 100 && Math.abs(fRTarget - robot.fRMotor.getCurrentPosition()) < 100 & Math.abs(bLTarget - robot.bLMotor.getCurrentPosition()) < 100 && Math.abs(bRTarget - robot.bRMotor.getCurrentPosition()) < 100)
                 {
-                    leftSpeed -= .05;
-                    rightSpeed -= .05;
+                    leftSpeed /= 3;
+                    rightSpeed /= 3;
                 }
                 // Normalize speeds if either one exceeds +/- 1.0;
                 max = Math.max(Math.abs(leftSpeed), Math.abs(rightSpeed));
@@ -730,7 +731,7 @@ public class AutonDrivingWIP extends LinearOpMode {
             normalDrive(0, 0);
 
             //correct for drift in angle
-            turnToPosition(angle, xyz, turnSpeed, 1000);
+            turnToPosition(angle, xyz, smallTurnSpeed, 1000);
 
             // Turn off RUN_TO_POSITION
             stopAndReset();
