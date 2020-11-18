@@ -22,7 +22,8 @@ public class TestAutonWIP extends AutonDrivingWIP {
         sleep(500);
         imu.startAccelerationIntegration(new Position(), new Velocity(), 1000);
 
-        turnToPosition(-90, xyz, turnSpeed, 5000);
+        //turnDegrees(-90, xyz, turnSpeed, 5000);
+        gyroDrive(15, 0, gyroDriveSpeed, 1000);
 
         pathComplete(500);
     }

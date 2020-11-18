@@ -34,7 +34,6 @@ import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.YZX;
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesReference.EXTRINSIC;
 import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.CameraDirection.BACK;
 
-//@Autonomous(name="AutonDrivingDriveOnly", group="AutonTesting")
 public class AutonDrivingWIP extends LinearOpMode {
 
     //
@@ -55,7 +54,7 @@ public class AutonDrivingWIP extends LinearOpMode {
 
     static final double     HEADING_THRESHOLD       = 1 ;      // As tight as we can make it with an integer gyro
     static final double     P_TURN_COEFF            = 0.1;     // Larger is more responsive, but also less stable
-    static final double     P_DRIVE_COEFF           = 0.15;     // Larger is more responsive, but also less stable
+    static final double     P_DRIVE_COEFF           = 0.05;     // Larger is more responsive, but also less stable
 
 
 
@@ -250,6 +249,15 @@ public class AutonDrivingWIP extends LinearOpMode {
     private double gyroTurnThreshold = .5;
     private double gyroTurnModLeft = .025;
     private double gyroTurnModRight = -.015;
+
+    //
+    //DRIVE
+    //
+    //public
+    public double gyroDriveSpeed = .4;
+
+    //private
+    private double gyroDriveThreshold = .7;
 
     @Override
     public void runOpMode()
@@ -527,7 +535,6 @@ public class AutonDrivingWIP extends LinearOpMode {
     //
     public void turnToPosition (double pos, String xyz, double topPower, double timeoutS) {
         //COUNTER CLOCKWISE IS POSITIVE; CLOCKWISE IS NEGATIVE
-        //TODO: FIX RIGHT TURN
 
         stopAndReset();
         double originalAngle = readAngle(xyz);
@@ -539,6 +546,15 @@ public class AutonDrivingWIP extends LinearOpMode {
         double error = angle - target;
         double powerScaled = topPower;
         double degreesTurned;
+
+        if(target < 0)
+        {
+            target += 3;
+        }
+        /*else if(target > 0)
+        {
+            target += .5;
+        }*/
         do {
             //salient values
             angle = readAngle(xyz);
@@ -589,7 +605,6 @@ public class AutonDrivingWIP extends LinearOpMode {
     public void turnDegrees(double degrees, String xyz, double topPower, double timeoutS)
     {
         //COUNTER CLOCKWISE IS POSITIVE; CLOCKWISE IS NEGATIVE
-        //TODO: TEST
 
         double originalAngle = readAngle(xyz);
         double angle = originalAngle + degrees;
@@ -597,10 +612,153 @@ public class AutonDrivingWIP extends LinearOpMode {
         turnToPosition(angle, xyz, topPower, timeoutS);
     }
 
+    public void gyroDrive (double inches, double angle, double speed, double timeoutS)
+    {
+        //TODO: FIX WOBBLE AND DRIFT; FIX DISTANCE
+        runtime.reset();
+        stopAndReset();
+
+        int fLTarget;
+        int fRTarget;
+        int bLTarget;
+        int bRTarget;
+
+        int fLInit = robot.fLMotor.getCurrentPosition();
+        int fRInit = robot.fRMotor.getCurrentPosition();
+        int bLInit = robot.bLMotor.getCurrentPosition();
+        int bRInit = robot.bRMotor.getCurrentPosition();
+
+        //int     newRightTarget;
+        int moveCounts;
+        double max;
+        double error;
+        double steer;
+        double leftSpeed;
+        double rightSpeed;
+
+        // Ensure that the opmode is still active
+        if (opModeIsActive()) {
+
+            // Determine new target position, and pass to motor controller
+            moveCounts = (int)(inches * COUNTS_PER_INCH);
+            fLTarget = robot.fLMotor.getCurrentPosition() + moveCounts;
+            fRTarget = robot.fRMotor.getCurrentPosition() + moveCounts;
+            bLTarget = robot.bLMotor.getCurrentPosition() + moveCounts;
+            bRTarget = robot.bLMotor.getCurrentPosition() + moveCounts;
+
+            // Set Target and Turn On RUN_TO_POSITION
+            robot.fLMotor.setTargetPosition(fLTarget);
+            robot.fRMotor.setTargetPosition(fRTarget);
+            robot.bLMotor.setTargetPosition(bLTarget);
+            robot.bRMotor.setTargetPosition(bRTarget);
+
+
+            robot.fLMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.fRMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.bLMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.bRMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+            // start motion.
+            //gyroDriveSpeed = Range.clip(Math.abs(speed), 0.0, 1.0);
+            robot.fLMotor.setPower(speed);
+            robot.fRMotor.setPower(speed);
+            robot.bLMotor.setPower(speed);
+            robot.bRMotor.setPower(speed);
+
+            // keep looping while we are still active, and BOTH motors are running.
+            while (opModeIsActive() &&
+                    (robot.fLMotor.isBusy() && robot.fRMotor.isBusy() && robot.bLMotor.isBusy() && robot.bRMotor.isBusy()) && runtime.seconds() < timeoutS) {
+
+                // adjust relative speed based on heading error.
+                error = getError(angle);
+
+                if(Math.abs(error) < gyroDriveThreshold)
+                {
+                    error = 0;
+                }
+
+                //changes powers in order to correct for turning while driving
+                steer = -getSteer(error, P_DRIVE_COEFF);
+
+                // if driving in reverse, the motor correction also needs to be reversed
+                if (inches < 0)
+                    steer *= -1.0;
+
+                leftSpeed = speed + steer;
+                rightSpeed = speed - steer;
+
+                //makes first 100 counts faster bc drive takes a lot of time to accelerate
+                /*if(initBoost) {
+                    if (Math.abs(robot.fLMotor.getCurrentPosition() - fLInit) < 100 && Math.abs(robot.bLMotor.getCurrentPosition() - bLInit) < 100)
+                    {
+                        leftSpeed += gyroDriveInitBoost;
+                    }
+                    if (Math.abs(robot.fRMotor.getCurrentPosition() - fRInit) < 100 && Math.abs(robot.bRMotor.getCurrentPosition() - bRInit) < 100)
+                    {
+                        rightSpeed += gyroDriveInitBoost;
+                    }
+                }*/
+                if(Math.abs(fLTarget - robot.fLMotor.getCurrentPosition()) < 100 && Math.abs(fRTarget - robot.fRMotor.getCurrentPosition()) < 100 & Math.abs(bLTarget - robot.bLMotor.getCurrentPosition()) < 100 && Math.abs(bRTarget - robot.bRMotor.getCurrentPosition()) < 100)
+                {
+                    leftSpeed -= .05;
+                    rightSpeed -= .05;
+                }
+                // Normalize speeds if either one exceeds +/- 1.0;
+                max = Math.max(Math.abs(leftSpeed), Math.abs(rightSpeed));
+                if (max > 1.0)
+                {
+                    leftSpeed /= max;
+                    rightSpeed /= max;
+                }
+
+                robot.fLMotor.setPower(leftSpeed);
+                robot.fRMotor.setPower(rightSpeed);
+                robot.bLMotor.setPower(leftSpeed);
+                robot.bRMotor.setPower(rightSpeed);
+
+                // Display drive status for the driver.
+                telemetry.addData("Err/St",  "%5.1f/%5.1f",  error, steer);
+                telemetry.addData("Target",  "%7d:%7d:%7d:%7d",      fLTarget,  fRTarget, bLTarget, bRTarget);
+                telemetry.addData("Actual",  "%7d:%7d:%7d:%7d",      robot.fLMotor.getCurrentPosition(),
+                        robot.fRMotor.getCurrentPosition(), robot.bLMotor.getCurrentPosition(), robot.bRMotor.getCurrentPosition());
+                telemetry.addData("Speed",   "%5.2f:%5.2f",  leftSpeed, rightSpeed);
+                telemetry.addData("Angle", angle);
+                telemetry.update();
+            }
+
+            // Stop all motion;
+            normalDrive(0, 0);
+
+            //correct for drift in angle
+            turnToPosition(angle, xyz, turnSpeed, 1000);
+
+            // Turn off RUN_TO_POSITION
+            stopAndReset();
+        }
+    }
+
     //
     //MISC
     //
-    public double pidMultiplierTurning(double error) {
+    public double getError(double targetAngle)
+    {
+
+        double robotError;
+
+        // calculate error in -179 to +180 range  (
+        robotError = targetAngle - readAngle("z");
+        while (robotError > 180)  robotError -= 360;
+        while (robotError <= -180) robotError += 360;
+        return robotError;
+    }
+
+    public double getSteer(double error, double PCoeff)
+    {
+        return Range.clip(error * PCoeff, -1, 1);
+    }
+
+    public double pidMultiplierTurning(double error)
+    {
         //equation for power multiplier is x/sqrt(x^2 + C)
         double C = .001;
         return Math.abs(error / Math.sqrt((error * error) + C));
