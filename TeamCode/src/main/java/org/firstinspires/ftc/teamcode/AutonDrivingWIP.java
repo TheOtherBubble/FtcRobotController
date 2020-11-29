@@ -47,7 +47,7 @@ public class AutonDrivingWIP extends LinearOpMode {
     //MEASURING CONSTANTS
     //
     static final double     COUNTS_PER_MOTOR_REV = 537.6;    // Currently: Andymark Neverest 20
-    static final double     DRIVE_GEAR_REDUCTION = .4;    // This is < 1.0 if geared UP //On OUR CENTER MOTOR THE GEAR REDUCTION IS .5
+    static final double     DRIVE_GEAR_REDUCTION = .33333;    // This is < 1.0 if geared UP //On OUR CENTER MOTOR THE GEAR REDUCTION IS .5
     static final double     WHEEL_DIAMETER_INCHES = 2.95276;     // For figuring circumference
     static final double     COUNTS_PER_INCH = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
             (WHEEL_DIAMETER_INCHES * Math.PI);
@@ -55,7 +55,6 @@ public class AutonDrivingWIP extends LinearOpMode {
     static final double     HEADING_THRESHOLD       = 1 ;      // As tight as we can make it with an integer gyro
     static final double     P_TURN_COEFF            = 0.1;     // Larger is more responsive, but also less stable
     static final double     P_DRIVE_COEFF           = 0.05;     // Larger is more responsive, but also less stable
-
 
 
     //
@@ -516,17 +515,13 @@ public class AutonDrivingWIP extends LinearOpMode {
 
     public void stopAndReset()
     {
-        //side motors
         robot.fLMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.fRMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
-        robot.fLMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        robot.fRMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-        //lateral motors
         robot.bLMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.bRMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
+        robot.fLMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.fRMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         robot.bLMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         robot.bRMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
@@ -534,7 +529,7 @@ public class AutonDrivingWIP extends LinearOpMode {
     //
     //TURNING
     //
-    public void turnToPosition (double pos, String xyz, double topPower, double timeoutS) {
+    public void turnToPosition (double pos, String xyz, double topPower, double timeoutS, boolean gyroDrive) {
         //COUNTER CLOCKWISE IS POSITIVE; CLOCKWISE IS NEGATIVE
 
         stopAndReset();
@@ -548,11 +543,11 @@ public class AutonDrivingWIP extends LinearOpMode {
         double powerScaled = topPower;
         double degreesTurned;
 
-        if(target < 0)
+        /*if(target < 0)
         {
             target += 3;
         }
-        /*else if(target > 0)
+        else if(target > 0)
         {
             target += .5;
         }*/
@@ -594,7 +589,7 @@ public class AutonDrivingWIP extends LinearOpMode {
 
             updateAngles();
         }
-        while (opModeIsActive() && (Math.abs(error) > gyroTurnThreshold) && (runtime.seconds() < timeoutS));
+        while (opModeIsActive() && ((Math.abs(error) > gyroTurnThreshold) || (gyroDrive && ((Math.abs(error) >= 1.75) && Math.abs(error) <= 2.25))) && (runtime.seconds() < timeoutS));
 
         //stop turning and reset for next action
         normalDrive(0, 0);
@@ -610,7 +605,7 @@ public class AutonDrivingWIP extends LinearOpMode {
         double originalAngle = readAngle(xyz);
         double angle = originalAngle + degrees;
 
-        turnToPosition(angle, xyz, topPower, timeoutS);
+        turnToPosition(angle, xyz, topPower, timeoutS, false);
     }
 
     public void gyroDrive (double inches, double angle, double speed, double timeoutS)
@@ -624,11 +619,6 @@ public class AutonDrivingWIP extends LinearOpMode {
         int bLTarget;
         int bRTarget;
 
-        int fLInit = robot.fLMotor.getCurrentPosition();
-        int fRInit = robot.fRMotor.getCurrentPosition();
-        int bLInit = robot.bLMotor.getCurrentPosition();
-        int bRInit = robot.bRMotor.getCurrentPosition();
-
         //int     newRightTarget;
         int moveCounts;
         double max;
@@ -636,6 +626,7 @@ public class AutonDrivingWIP extends LinearOpMode {
         double steer;
         double leftSpeed;
         double rightSpeed;
+        int decelerateThreshold = 170;
 
         // Ensure that the opmode is still active
         if (opModeIsActive()) {
@@ -699,7 +690,7 @@ public class AutonDrivingWIP extends LinearOpMode {
                         rightSpeed += gyroDriveInitBoost;
                     }
                 }*/
-                if(Math.abs(fLTarget - robot.fLMotor.getCurrentPosition()) < 100 && Math.abs(fRTarget - robot.fRMotor.getCurrentPosition()) < 100 & Math.abs(bLTarget - robot.bLMotor.getCurrentPosition()) < 100 && Math.abs(bRTarget - robot.bRMotor.getCurrentPosition()) < 100)
+                if(Math.abs(fLTarget - robot.fLMotor.getCurrentPosition()) < decelerateThreshold && Math.abs(fRTarget - robot.fRMotor.getCurrentPosition()) < decelerateThreshold && Math.abs(bLTarget - robot.bLMotor.getCurrentPosition()) < decelerateThreshold && Math.abs(bRTarget - robot.bRMotor.getCurrentPosition()) < decelerateThreshold)
                 {
                     leftSpeed /= 3;
                     rightSpeed /= 3;
@@ -730,8 +721,14 @@ public class AutonDrivingWIP extends LinearOpMode {
             // Stop all motion;
             normalDrive(0, 0);
 
-            //correct for drift in angle
-            turnToPosition(angle, xyz, smallTurnSpeed, 1000);
+            //attempted remedy for slow/unnecessary turn to position(goal was to to allow it to reset from stopping before it read angle
+            //sleep(333);
+
+            //correct for drift in angle (Adjusted because it was consistently attempting to turn with an error of close to 2 when no turn was necessary
+            if(getError(0) <= 2.25 || getError(0) >= 1.75)
+            {
+                turnToPosition(angle, xyz, smallTurnSpeed, 1000, true);
+            }
 
             // Turn off RUN_TO_POSITION
             stopAndReset();
