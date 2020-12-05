@@ -80,11 +80,11 @@ public class Hardware
         intakeMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
 
-        fLMotor.setDirection(DcMotor.Direction.FORWARD);//for
-        fRMotor.setDirection(DcMotor.Direction.REVERSE);//rev
-        bLMotor.setDirection(DcMotor.Direction.FORWARD);//for
-        bRMotor.setDirection(DcMotor.Direction.REVERSE);//REV
-        launcherMotor.setDirection(DcMotor.Direction.FORWARD);//FORWARD
+        fLMotor.setDirection(DcMotor.Direction.REVERSE);
+        fRMotor.setDirection(DcMotor.Direction.FORWARD);
+        bLMotor.setDirection(DcMotor.Direction.REVERSE);
+        bRMotor.setDirection(DcMotor.Direction.FORWARD);
+        launcherMotor.setDirection(DcMotor.Direction.FORWARD);
         intakeMotor.setDirection(DcMotor.Direction.FORWARD);
 
         launcherServo.scaleRange(0, 0.3);
