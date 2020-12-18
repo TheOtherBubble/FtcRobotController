@@ -46,9 +46,9 @@ public class AutonDrivingWIP extends LinearOpMode {
     //
     //MEASURING CONSTANTS
     //
-    static final double     COUNTS_PER_MOTOR_REV = 537.6;    // Currently: Andymark Neverest 20
-    static final double     DRIVE_GEAR_REDUCTION = .33333;    // This is < 1.0 if geared UP //On OUR CENTER MOTOR THE GEAR REDUCTION IS .5
-    static final double     WHEEL_DIAMETER_INCHES = 2.95276;     // For figuring circumference
+    static final double     COUNTS_PER_MOTOR_REV = 383.6;    // Currently: Andymark Neverest 20
+    static final double     DRIVE_GEAR_REDUCTION = .66666;    // This is < 1.0 if geared UP //On OUR CENTER MOTOR THE GEAR REDUCTION IS .5
+    static final double     WHEEL_DIAMETER_INCHES = 3.77953;     // For figuring circumference
     static final double     COUNTS_PER_INCH = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
             (WHEEL_DIAMETER_INCHES * Math.PI);
 
@@ -243,10 +243,14 @@ public class AutonDrivingWIP extends LinearOpMode {
     //GYRO CONSTANTS
     //public
     public double turnSpeed = .4;
-    public double smallTurnSpeed = .7;
+    public double smallTurnSpeed = .8;
+    public double NORTH = 0;
+    public double SOUTH = 180;
+    public double EAST = 90;
+    public double WEST = -90;
 
     //private
-    private double gyroTurnThreshold = .5;
+    private double gyroTurnThreshold = 1.4375;
     private double gyroTurnModLeft = .025;
     private double gyroTurnModRight = -.015;
 
@@ -255,9 +259,18 @@ public class AutonDrivingWIP extends LinearOpMode {
     //
     //public
     public double gyroDriveSpeed = .4;
+    public double gyroDriveSpeedStrafe = .5;
+    private double gyroStrafeAdj = 2;
 
     //private
     private double gyroDriveThreshold = .7;
+
+    //
+    //STRAFE
+    //
+
+    public boolean right = true;
+    public boolean left = false;
 
     @Override
     public void runOpMode()
@@ -526,6 +539,127 @@ public class AutonDrivingWIP extends LinearOpMode {
         robot.bRMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
+    public void strafe (int iterations, double speed, boolean isRight, double balanceReduction, double milliseconds, double moreBalance, double Angle)
+    {
+        //balance reduction: add to this if the back of the robot is faster than the front, subtract for opposite
+        //more balance: add to this if the robot is driving slightly backwards, subtract for opposite
+        stopAndReset();
+        runtime.reset();
+        //int     newRightTarget;
+        double fLSpeed = 0;
+        double fRSpeed = 0;
+        double bLSpeed = 0;
+        double bRSpeed = 0;
+        // Ensure that the opmode is still active
+        if (opModeIsActive()) {
+
+            // Determine new target position, and pass to motor controller
+            for(int i = 0; i < iterations; i++) {
+                ElapsedTime clock = new ElapsedTime();
+//                moveCounts = (int) (distance * COUNTS_PER_INCH)/10;
+//                fLTarget = (robot.fLMotor.getCurrentPosition() + moveCounts);
+//                fRTarget = (robot.fRMotor.getCurrentPosition() + moveCounts);
+//                bLTarget = (robot.bLMotor.getCurrentPosition() + moveCounts);
+//                bRTarget = (robot.bLMotor.getCurrentPosition() + moveCounts);
+//
+//                // Set Target and Turn On RUN_TO_POSITION
+//                robot.fLMotor.setTargetPosition(fLTarget);
+//                robot.fRMotor.setTargetPosition(-fRTarget);
+//                robot.bLMotor.setTargetPosition(-bLTarget);
+//                robot.bRMotor.setTargetPosition(bRTarget);
+
+
+                robot.fLMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                robot.fRMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                robot.bLMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                robot.bRMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+
+                // start motion.
+                //gyroDriveSpeed = Range.clip(Math.abs(speed), 0.0, 1.0);
+                while(clock.milliseconds() < milliseconds)
+                {
+                    fLSpeed = speed;
+                    fRSpeed = speed;
+                    bLSpeed = speed;
+                    bRSpeed = speed;
+
+                    if(isRight)
+                    {
+                        bRSpeed -= balanceReduction;
+                        fLSpeed += balanceReduction;
+                        fRSpeed += balanceReduction - moreBalance;
+                        bLSpeed -= balanceReduction - moreBalance;
+
+                        bLSpeed *= -1;
+                        fRSpeed *= -1;
+
+                    }
+                    else
+                    {
+                        bRSpeed -= balanceReduction - moreBalance;
+                        fLSpeed += balanceReduction - moreBalance;
+                        fRSpeed += balanceReduction;
+                        bLSpeed -= balanceReduction;
+
+                        fLSpeed *= -1;
+                        bRSpeed *= -1;
+
+                    }
+                    double max = Math.max(Math.max(fLSpeed, fRSpeed), Math.max(bLSpeed, bRSpeed));
+                    if(max > 1)
+                    {
+                        fLSpeed/=max;
+                        fRSpeed/=max;
+                        bLSpeed/=max;
+                        bRSpeed/=max;
+                    }
+
+
+                    robot.fLMotor.setPower(fLSpeed);
+                    robot.fRMotor.setPower(fRSpeed);
+                    robot.bLMotor.setPower(bLSpeed);
+                    robot.bRMotor.setPower(bRSpeed);
+
+                    telemetry.addData("fL Speed", fLSpeed);
+                    telemetry.addData("fR Speed", fRSpeed);
+                    telemetry.addData("bL Speed", bLSpeed);
+                    telemetry.addData("bR Speed", bRSpeed);
+                    telemetry.addData("milliseconds", milliseconds);
+                    telemetry.addData("clock", clock.milliseconds());
+                    telemetry.addData("iteration", i);
+                    telemetry.update();
+
+
+                }
+
+                //slow down bc jerk causes drift and turning
+                double inc = .85;
+                for(int j = 0; j < 15; j++)
+                {
+                    robot.fLMotor.setPower(robot.fLMotor.getPower()*inc);
+                    robot.fRMotor.setPower(robot.fRMotor.getPower()*inc);
+                    robot.bLMotor.setPower(robot.bLMotor.getPower()*inc);
+                    robot.bRMotor.setPower(robot.bRMotor.getPower()*inc);
+                }
+                normalDrive(0, 0); // stops it after 1 second
+                turnToPosition(Angle, "z", smallTurnSpeed, 500, true);
+                //turnToPosition(-angle, "z", turnSpeed, 4); //corrects at the end of each motion set
+                sleep(300);
+                //telemetry.addData("Target", "%7d:%7d:%7d:%7d", fLTarget, fRTarget, bLTarget, bRTarget);
+            }
+
+            // Stop all motion;
+            normalDrive(0, 0);
+
+            //correct for drift during drive
+            //turnToPosition(-angle, "z", turnSpeed, 3);
+
+            // Turn off RUN_TO_POSITION
+            stopAndReset();
+        }
+    }
+
     //
     //TURNING
     //
@@ -608,16 +742,31 @@ public class AutonDrivingWIP extends LinearOpMode {
         turnToPosition(angle, xyz, topPower, timeoutS, false);
     }
 
-    public void gyroDrive (double inches, double angle, double speed, double timeoutS)
+    public void gyroDrive (double inches, char direction, double angle, double speed, double timeoutS)
     {
-        //TODO: FIX WOBBLE AND DRIFT; FIX DISTANCE
+
         runtime.reset();
         stopAndReset();
 
-        int fLTarget;
-        int fRTarget;
-        int bLTarget;
-        int bRTarget;
+        int fLTarget = 0;
+        int fRTarget = 0;
+        int bLTarget = 0;
+        int bRTarget = 0;
+
+        double fLSpeed = speed;
+        double fRSpeed = speed;
+        double bLSpeed = speed;
+        double bRSpeed = speed;
+
+        double rightBalRed = .08;
+        double rightMoreBal = .4;
+        double balanceReduction = rightBalRed;
+        double moreBalance = rightMoreBal;
+
+
+        double leftBalRed = .05;
+        double leftMoreBal = .4;
+
 
         //int     newRightTarget;
         int moveCounts;
@@ -633,16 +782,73 @@ public class AutonDrivingWIP extends LinearOpMode {
 
             // Determine new target position, and pass to motor controller
             moveCounts = (int)(inches * COUNTS_PER_INCH);
-            fLTarget = robot.fLMotor.getCurrentPosition() + moveCounts;
-            fRTarget = robot.fRMotor.getCurrentPosition() + moveCounts;
-            bLTarget = robot.bLMotor.getCurrentPosition() + moveCounts;
-            bRTarget = robot.bLMotor.getCurrentPosition() + moveCounts;
+            if(direction == 'f')
+            {
+                fLTarget = robot.fLMotor.getCurrentPosition() + moveCounts;
+                fRTarget = robot.fRMotor.getCurrentPosition() + moveCounts;
+                bLTarget = robot.bLMotor.getCurrentPosition() + moveCounts;
+                bRTarget = robot.bLMotor.getCurrentPosition() + moveCounts;
+                robot.fLMotor.setTargetPosition(fLTarget);
+                robot.fRMotor.setTargetPosition(fRTarget);
+                robot.bLMotor.setTargetPosition(bLTarget);
+                robot.bRMotor.setTargetPosition(bRTarget);
+            }
+            else if(direction == 'b')
+            {
+                fLTarget = robot.fLMotor.getCurrentPosition() - moveCounts;
+                fRTarget = robot.fRMotor.getCurrentPosition() - moveCounts;
+                bLTarget = robot.bLMotor.getCurrentPosition() - moveCounts;
+                bRTarget = robot.bLMotor.getCurrentPosition() - moveCounts;
+                robot.fLMotor.setTargetPosition(fLTarget);
+                robot.fRMotor.setTargetPosition(fRTarget);
+                robot.bLMotor.setTargetPosition(bLTarget);
+                robot.bRMotor.setTargetPosition(bRTarget);
+            }
+            else if(direction == 'l')
+            {
+                moveCounts += gyroDriveSpeedStrafe; //janky
+
+                bRTarget = robot.bRMotor.getCurrentPosition() - moveCounts;
+                bLTarget = robot.bLMotor.getCurrentPosition() + moveCounts;
+                fRTarget = robot.fRMotor.getCurrentPosition() + moveCounts;
+                fLTarget = robot.fLMotor.getCurrentPosition() - moveCounts;
+
+                bRSpeed -= balanceReduction - moreBalance;
+                fLSpeed += balanceReduction - moreBalance;
+                fRSpeed += balanceReduction;
+                bLSpeed -= balanceReduction;
+
+                bRSpeed *= -1;
+                fLSpeed *= -1;
+
+                robot.bRMotor.setTargetPosition(bRTarget);
+                robot.bLMotor.setTargetPosition(bLTarget);
+                robot.fRMotor.setTargetPosition(fRTarget);
+                robot.fLMotor.setTargetPosition(fLTarget);
+
+            }
+            else if(direction == 'r')
+            {
+                moveCounts += gyroDriveSpeedStrafe; //janky
+                fLTarget = robot.fLMotor.getCurrentPosition() + moveCounts;
+                fRTarget = robot.fRMotor.getCurrentPosition() - moveCounts;
+                bLTarget = robot.bLMotor.getCurrentPosition() - moveCounts;
+                bRTarget = robot.bLMotor.getCurrentPosition() + moveCounts;
+
+
+
+                robot.fLMotor.setTargetPosition(fLTarget);
+                robot.fRMotor.setTargetPosition(fRTarget);
+                robot.bLMotor.setTargetPosition(bLTarget);
+                robot.bRMotor.setTargetPosition(bRTarget);
+            }
+
 
             // Set Target and Turn On RUN_TO_POSITION
-            robot.fLMotor.setTargetPosition(fLTarget);
-            robot.fRMotor.setTargetPosition(fRTarget);
-            robot.bLMotor.setTargetPosition(bLTarget);
-            robot.bRMotor.setTargetPosition(bRTarget);
+//            robot.fLMotor.setTargetPosition(fLTarget);
+//            robot.fRMotor.setTargetPosition(fRTarget);
+//            robot.bLMotor.setTargetPosition(bLTarget);
+//            robot.bRMotor.setTargetPosition(bRTarget);
 
 
             robot.fLMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -652,10 +858,10 @@ public class AutonDrivingWIP extends LinearOpMode {
 
             // start motion.
             //gyroDriveSpeed = Range.clip(Math.abs(speed), 0.0, 1.0);
-            robot.fLMotor.setPower(speed);
-            robot.fRMotor.setPower(speed);
-            robot.bLMotor.setPower(speed);
-            robot.bRMotor.setPower(speed);
+            robot.fLMotor.setPower(fLSpeed);
+            robot.fRMotor.setPower(fRSpeed);
+            robot.bLMotor.setPower(bLSpeed);
+            robot.bRMotor.setPower(bRSpeed);
 
             // keep looping while we are still active, and BOTH motors are running.
             while (opModeIsActive() &&

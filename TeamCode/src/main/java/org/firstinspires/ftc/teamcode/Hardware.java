@@ -25,10 +25,10 @@ public class Hardware
     public DcMotor intakeMotor;
 
     //declaring values for use with encoders
-    static final double     COUNTS_PER_MOTOR_REV    = 1120 ;    // AndyMark Motor Encoder
-    static final double     DRIVE_GEAR_REDUCTION    = 1.0;     // This is < 1.0 if geared UP
-    static final double     WHEEL_DIAMETER_INCHES   = 0.19685039;     // For fwiguring circumference
-    static final double     COUNTS_PER_INCH         = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) / (WHEEL_DIAMETER_INCHES * 3.1415);
+    static final double     COUNTS_PER_MOTOR_REV    = 383.6 ;    // AndyMark Motor Encoder
+    static final double     DRIVE_GEAR_REDUCTION    = 1.5;     // This is < 1.0 if geared UP
+    static final double     WHEEL_DIAMETER_INCHES   = 3.77953;     // For fwiguring circumference
+    static final double     COUNTS_PER_INCH         = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) / (WHEEL_DIAMETER_INCHES * Math.PI);
 
     /* Local OpMode members. */
     HardwareMap hwMap  = null;

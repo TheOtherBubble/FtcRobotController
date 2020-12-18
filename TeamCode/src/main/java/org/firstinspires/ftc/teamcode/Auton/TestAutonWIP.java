@@ -24,10 +24,13 @@ public class TestAutonWIP extends AutonDrivingWIP {
 
         //turnDegrees(-90, xyz, turnSpeed, 5000);
         //turnDegrees(180, xyz, turnSpeed, 5000);
-        turnToPosition(90, xyz, turnSpeed, 10, false);
-        turnToPosition(-90, xyz, turnSpeed, 10, false);
-        turnToPosition(-179, xyz, turnSpeed, 10, false);
-        //gyroDrive(26.5, readAngle(xyz), gyroDriveSpeed, 1000);
+        //turnToPosition(90, xyz, turnSpeed, 10, false);
+        //turnToPosition(-90, xyz, turnSpeed, 10, false);
+        //turnToPosition(-179, xyz, turnSpeed, 10, false);
+        gyroDrive(20, 'l', readAngle(xyz), gyroDriveSpeedStrafe, 500);
+        //strafe(1, strafeSpeed, right, rightBalRed, 600, rightMoreBal, NORTH); //strafe template
+        //works with 200ms, 300ms, 500ms, does not work at 800ms other vals have not been tested
+        //strafe(1, strafeSpeed, left, leftBalRed, 600, leftMoreBal, NORTH); //ending turntoposition is sus
 
         pathComplete(500);
     }

@@ -43,12 +43,12 @@ public class AutonDriving extends LinearOpMode {
     public ElapsedTime runtime = new ElapsedTime();
     public String xyz = "z";
     //CONTAINS ALL METHODS AND VARIABlES TO BE EXTENDED BY OTHER AUTON CLASSES
-    static final double     COUNTS_PER_MOTOR_REV = 537.6;    // Currently: Andymark Neverest 20
+    static final double     COUNTS_PER_MOTOR_REV = 383.6;    // Currently: Andymark Neverest 20
     //static final double     COUNTS_PER_REV_ARM = 1495; //torquenado
     //static final double     PULLEY_DIAMETER = 1.3;
     // static final double     COUNTS_PER_INCH_ARM = COUNTS_PER_REV_ARM/(PULLEY_DIAMETER * Math.PI);
-    static final double     DRIVE_GEAR_REDUCTION = .4;    // This is < 1.0 if geared UP //On OUR CENTER MOTOR THE GEAR REDUCTION IS .5
-    static final double     WHEEL_DIAMETER_INCHES = 2.95276;     // For figuring circumference
+    static final double     DRIVE_GEAR_REDUCTION = .66666;    // This is < 1.0 if geared UP //On OUR CENTER MOTOR THE GEAR REDUCTION IS .5
+    static final double     WHEEL_DIAMETER_INCHES = 3.77953;     // For figuring circumference
     static final double     COUNTS_PER_INCH = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
             (WHEEL_DIAMETER_INCHES * Math.PI);
 
@@ -124,10 +124,7 @@ public class AutonDriving extends LinearOpMode {
     public double EAST = 90;
     public double WEST = -90;
 
-    public double rightBalRed = .08; //.1
-    public double leftBalRed = .05;
-    public double leftMoreBal = .4;
-    public double rightMoreBal = .4;
+
 
     public double strafeSpeed = .8;
 
@@ -597,10 +594,10 @@ public class AutonDriving extends LinearOpMode {
         //robot.armLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         //robot.susan.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         //
-        robot.bRMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        robot.bLMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        robot.fRMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        robot.fLMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        robot.bRMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        robot.bLMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        robot.fRMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        robot.fLMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         //robot.armExt.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         //robot.armLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         //robot.susan.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
