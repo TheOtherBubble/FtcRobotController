@@ -268,9 +268,16 @@ public class AutonDrivingWIP extends LinearOpMode {
     //
     //STRAFE
     //
-
     public boolean right = true;
     public boolean left = false;
+
+    //balance reduction: add to this if the back of the robot is faster than the front, subtract for opposite
+    //more balance: add to this if the robot is driving slightly backwards, subtract for opposite
+    private double rightBalRed = .08;
+    private double rightMoreBal = .4;
+
+    private double leftBalRed = .05;
+    private double leftMoreBal = .4;
 
     @Override
     public void runOpMode()
@@ -541,6 +548,8 @@ public class AutonDrivingWIP extends LinearOpMode {
 
     public void strafe (int iterations, double speed, boolean isRight, double balanceReduction, double milliseconds, double moreBalance, double Angle)
     {
+        //LEGACY STRAFE
+
         //balance reduction: add to this if the back of the robot is faster than the front, subtract for opposite
         //more balance: add to this if the robot is driving slightly backwards, subtract for opposite
         stopAndReset();
@@ -595,6 +604,7 @@ public class AutonDrivingWIP extends LinearOpMode {
                         fRSpeed *= -1;
 
                     }
+
                     else
                     {
                         bRSpeed -= balanceReduction - moreBalance;
@@ -606,6 +616,7 @@ public class AutonDrivingWIP extends LinearOpMode {
                         bRSpeed *= -1;
 
                     }
+
                     double max = Math.max(Math.max(fLSpeed, fRSpeed), Math.max(bLSpeed, bRSpeed));
                     if(max > 1)
                     {
@@ -614,7 +625,6 @@ public class AutonDrivingWIP extends LinearOpMode {
                         bLSpeed/=max;
                         bRSpeed/=max;
                     }
-
 
                     robot.fLMotor.setPower(fLSpeed);
                     robot.fRMotor.setPower(fRSpeed);
@@ -629,7 +639,6 @@ public class AutonDrivingWIP extends LinearOpMode {
                     telemetry.addData("clock", clock.milliseconds());
                     telemetry.addData("iteration", i);
                     telemetry.update();
-
 
                 }
 
@@ -758,14 +767,7 @@ public class AutonDrivingWIP extends LinearOpMode {
         double bLSpeed = speed;
         double bRSpeed = speed;
 
-        double rightBalRed = .08;
-        double rightMoreBal = .4;
-        double balanceReduction = rightBalRed;
-        double moreBalance = rightMoreBal;
 
-
-        double leftBalRed = .05;
-        double leftMoreBal = .4;
 
 
         //int     newRightTarget;
@@ -806,6 +808,9 @@ public class AutonDrivingWIP extends LinearOpMode {
             }
             else if(direction == 'l')
             {
+                double balanceReduction = leftBalRed;
+                double moreBalance = leftMoreBal;
+
                 moveCounts += gyroDriveSpeedStrafe; //janky
 
                 bRTarget = robot.bRMotor.getCurrentPosition() - moveCounts;
@@ -829,18 +834,28 @@ public class AutonDrivingWIP extends LinearOpMode {
             }
             else if(direction == 'r')
             {
+                double balanceReduction = rightBalRed;
+                double moreBalance = rightMoreBal;
+
                 moveCounts += gyroDriveSpeedStrafe; //janky
                 fLTarget = robot.fLMotor.getCurrentPosition() + moveCounts;
                 fRTarget = robot.fRMotor.getCurrentPosition() - moveCounts;
                 bLTarget = robot.bLMotor.getCurrentPosition() - moveCounts;
                 bRTarget = robot.bLMotor.getCurrentPosition() + moveCounts;
 
+                bRSpeed -= balanceReduction;
+                fLSpeed += balanceReduction;
+                fRSpeed += balanceReduction - moreBalance;
+                bLSpeed -= balanceReduction - moreBalance;
 
+                bLSpeed *= -1;
+                fRSpeed *= -1;
 
                 robot.fLMotor.setTargetPosition(fLTarget);
                 robot.fRMotor.setTargetPosition(fRTarget);
                 robot.bLMotor.setTargetPosition(bLTarget);
                 robot.bRMotor.setTargetPosition(bRTarget);
+
             }
 
 
@@ -864,6 +879,8 @@ public class AutonDrivingWIP extends LinearOpMode {
             robot.bRMotor.setPower(bRSpeed);
 
             // keep looping while we are still active, and BOTH motors are running.
+            //WILL NOT WORK WITH STRAFE
+            //TODO: MAKE STRAFE COMPATIBLE (BOTH WHILE LOOP AND STEER FUNCTION)
             while (opModeIsActive() &&
                     (robot.fLMotor.isBusy() && robot.fRMotor.isBusy() && robot.bLMotor.isBusy() && robot.bRMotor.isBusy()) && runtime.seconds() < timeoutS) {
 
