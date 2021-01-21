@@ -78,9 +78,10 @@ public class TestAuton extends AutonDriving {
 
         waitForStart();
 
-        strafe(1, strafeSpeed, right, rightBalRed, 500, rightMoreBal, NORTH); //strafe template
+
+        //strafe(1, strafeSpeed, right, rightBalRed, 500, rightMoreBal, NORTH); //strafe template
         //works with 200ms, 300ms, 500ms, does not work at 800ms other vals have not been tested
-        strafe(1, strafeSpeed, left, leftBalRed, 500, leftMoreBal, NORTH); //ending turntoposition is sus
+        //strafe(1, strafeSpeed, left, leftBalRed, 500, leftMoreBal, NORTH); //ending turntoposition is sus
 
     }
 }

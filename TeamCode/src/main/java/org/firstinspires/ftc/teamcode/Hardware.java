@@ -25,13 +25,10 @@ public class Hardware
     public DcMotor intakeMotor;
 
     //declaring values for use with encoders
-    static final double     COUNTS_PER_MOTOR_REV    = 1120 ;    // AndyMark Motor Encoder
-    static final double     DRIVE_GEAR_REDUCTION    = 1.0;     // This is < 1.0 if geared UP
-    static final double     WHEEL_DIAMETER_INCHES   = 0.19685039;     // For fwiguring circumference
-    static final double     COUNTS_PER_INCH         = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) / (WHEEL_DIAMETER_INCHES * 3.1415);
-    static final double     VERT_INCHES             = 3.0;      //inches to raise verticalarm       TODO: test for real value
-    static final double     HORZ_INCHES             = 3.0;      //inches to extend horzizantalarm   TODO: test for real value
-    static final double     EN_ARM_SPEED            = 0.2;      //speed of arm movement
+    static final double     COUNTS_PER_MOTOR_REV    = 383.6 ;    // AndyMark Motor Encoder
+    static final double     DRIVE_GEAR_REDUCTION    = 1.5;     // This is < 1.0 if geared UP
+    static final double     WHEEL_DIAMETER_INCHES   = 3.77953;     // For fwiguring circumference
+    static final double     COUNTS_PER_INCH         = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) / (WHEEL_DIAMETER_INCHES * Math.PI);
 
     /* Local OpMode members. */
     HardwareMap hwMap  = null;
@@ -83,11 +80,11 @@ public class Hardware
         intakeMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
 
-        fLMotor.setDirection(DcMotor.Direction.FORWARD);//for
-        fRMotor.setDirection(DcMotor.Direction.REVERSE);//rev
-        bLMotor.setDirection(DcMotor.Direction.FORWARD);//for
-        bRMotor.setDirection(DcMotor.Direction.REVERSE);//REV
-        launcherMotor.setDirection(DcMotor.Direction.FORWARD);//FORWARD
+        fLMotor.setDirection(DcMotor.Direction.REVERSE);
+        fRMotor.setDirection(DcMotor.Direction.FORWARD);
+        bLMotor.setDirection(DcMotor.Direction.REVERSE);
+        bRMotor.setDirection(DcMotor.Direction.FORWARD);
+        launcherMotor.setDirection(DcMotor.Direction.FORWARD);
         intakeMotor.setDirection(DcMotor.Direction.FORWARD);
 
         launcherServo.scaleRange(0, 0.3);

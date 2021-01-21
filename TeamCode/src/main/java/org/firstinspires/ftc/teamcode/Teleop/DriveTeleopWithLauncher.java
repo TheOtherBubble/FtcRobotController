@@ -106,6 +106,7 @@ public class DriveTeleopWithLauncher extends OpMode {
     Hardware robot = new Hardware();
 
     private float drive = .6f;
+    private float fullDrive = 1;
     //private float BRDrive = 1f;
 
     @Override
@@ -214,10 +215,10 @@ public class DriveTeleopWithLauncher extends OpMode {
         final double v3 = r * Math.sin(robotAngle) - rightX;
         final double v4 = r * Math.cos(robotAngle) + rightX;
 
-        robot.fLMotor.setPower(-drive * v1);
-        robot.fRMotor.setPower(-drive * v2);
-        robot.bLMotor.setPower(-drive * v3);
-        robot.bRMotor.setPower(-drive * v4);
+        robot.fLMotor.setPower(-fullDrive * v1);
+        robot.fRMotor.setPower(-fullDrive * v2);
+        robot.bLMotor.setPower(-fullDrive * v3);
+        robot.bRMotor.setPower(-fullDrive * v4);
 
 //        telemetry.addData("fLPower", -drive * v1);
 //        telemetry.addData("fRPower", -drive * v2);
