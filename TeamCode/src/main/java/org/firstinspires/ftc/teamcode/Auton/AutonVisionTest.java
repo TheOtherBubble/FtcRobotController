@@ -44,7 +44,7 @@ import java.util.List;
 
 @Autonomous(name="Auton Vision Test", group="FullAuton")
 //@Disabled
-public class  AutonVisionTest extends LinearOpMode {
+public class     AutonVisionTest extends LinearOpMode {
 
     /* Declare OpMode members. */
     Hardware robot = new Hardware();   // Use a Pushbot's hardware

@@ -47,12 +47,12 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="Motor Test", group="Test")
+@TeleOp(name="Servo Test", group="Test")
 //@Disabled
-public class MotorTest extends OpMode{
+public class ServoTest extends OpMode{
 
     /* Declare OpMode members. */
-    MotorTestHardware robot       = new MotorTestHardware(); // use the class created to define a Pushbot's hardware
+    ServoTestHardware robot       = new ServoTestHardware(); // use the class created to define a Pushbot's hardware
     double          clawOffset  = 0.0 ;                  // Servo mid position
     final double    CLAW_SPEED  = 0.02 ;                 // sets rate to move servo
     double             power       = 0;
@@ -82,6 +82,7 @@ public class MotorTest extends OpMode{
      */
     @Override
     public void start() {
+
     }
 
     /*
@@ -90,27 +91,15 @@ public class MotorTest extends OpMode{
     @Override
     public void loop() {
         if (gamepad1.a) {
-            power = 0.3;
+            robot.servo.setPosition(1);
         }
-        else if (gamepad1.b) {
-            power = 0.5;
-        }
-        else if (gamepad1.y) {
-            power = 0.7;
+        else if (gamepad1.b){
+            robot.servo.setPosition(0);
         }
         else {
-            power = 0;
+            robot.servo.setPosition(.5);
         }
-        if (gamepad1.dpad_up) {
-            power += 0.1;
-        }
-        else if (gamepad1.dpad_down) {
-            power -= 0.1;
-        }
-        if (gamepad1.x) {
-            power = 1.0;
-        }
-        robot.motor.setPower(power);
+        telemetry.addData("Position", robot.servo.getPosition());
     }
 
     /*
