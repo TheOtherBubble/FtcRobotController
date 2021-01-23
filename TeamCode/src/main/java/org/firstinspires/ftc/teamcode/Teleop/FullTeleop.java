@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.Teleop;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.FullHardware;
 import org.firstinspires.ftc.teamcode.Hardware;
 
 //import org.firstinspires.ftc.teamcode.src.main.java.org.firstinspires.ftc.teamcode.DriveOnlyHardware;
@@ -15,7 +14,7 @@ import org.firstinspires.ftc.teamcode.Hardware;
 
 public class FullTeleop extends OpMode {
 
-    FullHardware robot = new FullHardware();
+    Hardware robot = new Hardware();
 
     private float drive = .55f;
     //private float BRDrive = 1f;
@@ -34,17 +33,21 @@ public class FullTeleop extends OpMode {
     public void loop()
 
     {
-        robot.launch(gamepad1.x);
-//        if (gamepad1.b) {
-//            robot.claw.setPosition(1);
-//        }
-//        else if (gamepad1.a){
-//            robot.claw.setPosition(0);
-//        }
-//        else {
-//            robot.claw.setPosition(.5);
-//        }
-
+        if (gamepad1.x) {
+            robot.launcherServo.setPosition(1);
+        }
+        else {
+            robot.launcherServo.setPosition(0);
+        }
+        if (gamepad1.b) {
+            robot.claw.setPosition(1);
+        }
+        else if (gamepad1.a){
+            robot.claw.setPosition(0);
+        }
+        else {
+            robot.claw.setPosition(.5);
+        }
         if (gamepad1.right_bumper) {
             robot.launcherMotor.setPower(.78);
         }

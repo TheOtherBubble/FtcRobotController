@@ -43,12 +43,9 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
-import org.firstinspires.ftc.robotcore.external.navigation.Position;
-import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
-import org.firstinspires.ftc.teamcode.FullHardware;
 import org.firstinspires.ftc.teamcode.Hardware;
 
 import java.util.List;
@@ -58,7 +55,7 @@ import java.util.List;
 public class PartialAutonBlue extends LinearOpMode {
 
     /* Declare OpMode members. */
-    FullHardware robot = new FullHardware();   // Use a Pushbot's hardware
+    org.firstinspires.ftc.teamcode.Hardware robot = new org.firstinspires.ftc.teamcode.Hardware();   // Use a Pushbot's hardware
     private ElapsedTime     runtime = new ElapsedTime();
 
     static final double     FORWARD_SPEED = 0.4;
@@ -69,14 +66,14 @@ public class PartialAutonBlue extends LinearOpMode {
     private static final String LABEL_FIRST_ELEMENT = "Quad";
     private static final String LABEL_SECOND_ELEMENT = "Single";
 
-    String xyz = "z";
+    public String xyz = "z";
 
-    static final double     COUNTS_PER_MOTOR_REV = 1120 ;    // Currently: Andymark Neverest 40
-    static final double     COUNTS_PER_REV_ARM = 1440;
-    static final double     COUNTS_PER_INCH_ARM = COUNTS_PER_REV_ARM/4;
-    static final double     DRIVE_GEAR_REDUCTION = .9;     // This is < 1.0 if geared UP //On OUR CENTER MOTOR THE GEAR REDUCTION IS .5
-    static final double     WHEEL_DIAMETER_INCHES = 3.54331;     // For figuring circumference
-    static final double     COUNTS_PER_INCH = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
+    public static final double     COUNTS_PER_MOTOR_REV = 383.6;    // Currently: Andymark Neverest 40
+    public static final double     COUNTS_PER_REV_ARM = 1440;
+    public static final double     COUNTS_PER_INCH_ARM = COUNTS_PER_REV_ARM/4;
+    public static final double     DRIVE_GEAR_REDUCTION = .666;     // This is < 1.0 if geared UP //On OUR CENTER MOTOR THE GEAR REDUCTION IS .5
+    public static final double     WHEEL_DIAMETER_INCHES = 3.7795;     // For figuring circumference
+    public static final double     COUNTS_PER_INCH = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
             (WHEEL_DIAMETER_INCHES * 3.1415);
 
     private VuforiaLocalizer vuforia;
@@ -151,6 +148,7 @@ public class PartialAutonBlue extends LinearOpMode {
         if (ringLabel.equals("Quad")) {
             telemetry.addData("Target Zone", "C");
             telemetry.update();
+            encoderDrive(0.5,'l',4.5,4);
             encoderDrive(0.4,'b',114,10);
             turnToPosition(270,xyz,0.5,4,false);
             encoderDrive(0.4,'b',24,5);
@@ -159,6 +157,7 @@ public class PartialAutonBlue extends LinearOpMode {
         else if (ringLabel.equals("Single")) {
             telemetry.addData("Target Zone", "B");
             telemetry.update();
+            encoderDrive(0.5,'l',4.5,4);
             encoderDrive(0.4,'b',90,7);
             turnToPosition(270,xyz,0.5,4,false);
             encoderDrive(0.4,'b',10,5);
@@ -166,6 +165,7 @@ public class PartialAutonBlue extends LinearOpMode {
         else {
             telemetry.addData("Target Zone", "A");
             telemetry.update();
+            encoderDrive(0.5,'l',4.5,4);
             encoderDrive(0.4,'b',66,5);
             turnToPosition(270,xyz,0.5,4,false);
             encoderDrive(0.4,'b',24,5);
