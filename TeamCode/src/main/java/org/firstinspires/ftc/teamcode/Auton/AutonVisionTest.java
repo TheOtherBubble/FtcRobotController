@@ -118,30 +118,32 @@ public class     AutonVisionTest extends LinearOpMode {
         if (ringLabel.equals("Quad")) {
             telemetry.addData("Target Zone", "C");
             telemetry.update();
-            drive('f', 3);
-            sleep(500);
-            turn('r', .5);
-            sleep(500);
-            drive('f', .5);
+            sleep(5000);
+//            drive('f', 3);
+//            sleep(500);
+//            turn('r', .5);
+//            sleep(500);
+//            drive('f', .5);
         }
-
         else if (ringLabel.equals("Single")) {
             telemetry.addData("Target Zone", "B");
             telemetry.update();
-            drive('f',2.5);
-            sleep(500);
-            turn('r', .5);
-            sleep(500);
-            drive('f',.1);
+            sleep(5000);
+//            drive('f',2.5);
+//            sleep(500);
+//            turn('r', .5);
+//            sleep(500);
+//            drive('f',.1);
         }
         else {
             telemetry.addData("Target Zone", "A");
             telemetry.update();
-            drive('f', 2);
-            sleep(500);
-            turn('r', .5);
-            sleep(500);
-            drive('f', .5);
+            sleep(5000);
+//            drive('f', 2);
+//            sleep(500);
+//            turn('r', .5);
+//            sleep(500);
+//            drive('f', .5);
         }
     }
     private void drive(char direction, double time) {

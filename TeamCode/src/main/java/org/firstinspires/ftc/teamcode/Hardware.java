@@ -39,7 +39,7 @@ public class Hardware
 
 
     /* Local OpMode members. */
-    HardwareMap hwMap  = null;
+    HardwareMap hwMap;
 
     /* Initialize standard Hardware interfaces */
     public void init(HardwareMap ahwMap) {
@@ -53,6 +53,8 @@ public class Hardware
         bLMotor = hwMap.get(DcMotor.class, "bLMotor");
 
         launcherMotor = hwMap.get(DcMotor.class, "launcherMotor");
+
+        intakeMotor = hwMap.get(DcMotor.class, "intakeMotor");
 
         launcherServo = hwMap.get(Servo.class, "launcherServo");
 

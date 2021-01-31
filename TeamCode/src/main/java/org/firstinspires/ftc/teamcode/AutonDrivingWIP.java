@@ -46,15 +46,15 @@ public class AutonDrivingWIP extends LinearOpMode {
     //
     //MEASURING CONSTANTS
     //
-    static final double     COUNTS_PER_MOTOR_REV = 383.6;    // Currently: Andymark Neverest 20
-    static final double     DRIVE_GEAR_REDUCTION = .66666;    // This is < 1.0 if geared UP //On OUR CENTER MOTOR THE GEAR REDUCTION IS .5
-    static final double     WHEEL_DIAMETER_INCHES = 3.77953;     // For figuring circumference
-    static final double     COUNTS_PER_INCH = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
+    public static final double     COUNTS_PER_MOTOR_REV = 383.6;    // Currently: Andymark Neverest 20
+    public static final double     DRIVE_GEAR_REDUCTION = .66666;    // This is < 1.0 if geared UP //On OUR CENTER MOTOR THE GEAR REDUCTION IS .5
+    public static final double     WHEEL_DIAMETER_INCHES = 3.77953;     // For figuring circumference
+    public static final double     COUNTS_PER_INCH = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
             (WHEEL_DIAMETER_INCHES * Math.PI);
 
-    static final double     HEADING_THRESHOLD       = 1 ;      // As tight as we can make it with an integer gyro
-    static final double     P_TURN_COEFF            = 0.1;     // Larger is more responsive, but also less stable
-    static final double     P_DRIVE_COEFF           = 0.05;     // Larger is more responsive, but also less stable
+    public static final double     HEADING_THRESHOLD       = 1 ;      // As tight as we can make it with an integer gyro
+    public static final double     P_TURN_COEFF            = 0.1;     // Larger is more responsive, but also less stable
+    public static final double     P_DRIVE_COEFF           = 0.05;     // Larger is more responsive, but also less stable
 
 
     //
@@ -249,10 +249,10 @@ public class AutonDrivingWIP extends LinearOpMode {
     public double EAST = 90;
     public double WEST = -90;
 
-    //private
-    private double gyroTurnThreshold = 1.4375;
-    private double gyroTurnModLeft = .025;
-    private double gyroTurnModRight = -.015;
+
+    public double gyroTurnThreshold = 1.4375;
+    public double gyroTurnModLeft = .025;
+    public double gyroTurnModRight = -.015;
 
     //
     //DRIVE
@@ -262,8 +262,8 @@ public class AutonDrivingWIP extends LinearOpMode {
     public double gyroDriveSpeedStrafe = .5;
     private double gyroStrafeAdj = 2;
 
-    //private
-    private double gyroDriveThreshold = .7;
+    public double gyroDriveThreshold = .7;
+    public double gyroDriveInitBoost = .15;
 
     //
     //STRAFE
@@ -535,15 +535,22 @@ public class AutonDrivingWIP extends LinearOpMode {
 
     public void stopAndReset()
     {
-        robot.fLMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        robot.fRMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        robot.bLMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        robot.bRMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        try {
+            robot.fLMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            robot.fRMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            robot.bLMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            robot.bRMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        robot.fLMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        robot.fRMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        robot.bLMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        robot.bRMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.fLMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.fRMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.bLMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.bRMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        }
+        catch(NullPointerException e)
+        {
+
+        }
+
     }
 
     public void strafe (int iterations, double speed, boolean isRight, double balanceReduction, double milliseconds, double moreBalance, double Angle)
@@ -578,10 +585,16 @@ public class AutonDrivingWIP extends LinearOpMode {
 //                robot.bRMotor.setTargetPosition(bRTarget);
 
 
-                robot.fLMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                robot.fRMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                robot.bLMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                robot.bRMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                try {
+                    robot.fLMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                    robot.fRMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                    robot.bLMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                    robot.bRMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                }
+                catch(NullPointerException e)
+                {
+
+                }
 
 
                 // start motion.

@@ -46,13 +46,14 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
+import org.firstinspires.ftc.teamcode.AutonDrivingWIP;
 import org.firstinspires.ftc.teamcode.Hardware;
 
 import java.util.List;
 
 @Autonomous(name="Blue Auton", group="FullAuton")
 //@Disabled
-public class PartialAutonBlue extends LinearOpMode {
+public class PartialAutonBlue extends AutonDrivingWIP {
 
     /* Declare OpMode members. */
     org.firstinspires.ftc.teamcode.Hardware robot = new org.firstinspires.ftc.teamcode.Hardware();   // Use a Pushbot's hardware
@@ -104,7 +105,7 @@ public class PartialAutonBlue extends LinearOpMode {
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         imu.initialize(parameters);
 
-        initVuforia();
+        this.initVuforia(); //this should ensure that it calls the Vuforia of this class not the one from the AutonDrivingWIP class. This is a test given an error that appeared to happen during Vuforia initialization.
         initTfod();
 
         if (tfod != null) {
@@ -149,29 +150,47 @@ public class PartialAutonBlue extends LinearOpMode {
             telemetry.addData("Target Zone", "C");
             telemetry.update();
             encoderDrive(0.5,'l',4.5,4);
+            //gyroDrive(4.5, 'l', 0, gyroDriveSpeed, 10);
             encoderDrive(0.4,'b',114,10);
-            turnToPosition(270,xyz,0.5,4,false);
+            //gyroDrive(114, 'b', 0, gyroDriveSpeed, 10);
+            turnToPosition(90,xyz,0.5,4,false);
+            //turnDegrees(90, xyz, turnSpeed, 10);
             encoderDrive(0.4,'b',24,5);
+            //gyroDrive(24, 'b', 270, gyroDriveSpeed, 10);
         }
 
         else if (ringLabel.equals("Single")) {
             telemetry.addData("Target Zone", "B");
             telemetry.update();
             encoderDrive(0.5,'l',4.5,4);
+
             encoderDrive(0.4,'b',90,7);
-            turnToPosition(270,xyz,0.5,4,false);
+
+            turnToPosition(90,xyz,0.5,4,false);
+
             encoderDrive(0.4,'b',10,5);
+            //release claw
+            //raise claw
+            //encoderDrive forward 10
+            //turnToPosition 0
+            //encoderDrive forward 15 (guess value)
+
         }
         else {
             telemetry.addData("Target Zone", "A");
             telemetry.update();
             encoderDrive(0.5,'l',4.5,4);
+            //gyroDrive(4.5, 'l', 0, gyroDriveSpeed, 10);
             encoderDrive(0.4,'b',66,5);
-            turnToPosition(270,xyz,0.5,4,false);
+            //gyroDrive(66, 'b', 0, gyroDriveSpeed, 10);
+            turnToPosition(90,xyz,0.5,4,false);
+            //turnDegrees(90, xyz, turnSpeed, 10);
             encoderDrive(0.4,'b',24,5);
+            //gyroDrive(24, 'b', 270, gyroDriveSpeed, 10);
         }
     }
-    private void initVuforia() {
+
+    public void initVuforia() {
         /*
          * Configure Vuforia by creating a Parameter object, and passing it to the Vuforia engine.
          */
@@ -197,6 +216,76 @@ public class PartialAutonBlue extends LinearOpMode {
         tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
         tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_FIRST_ELEMENT, LABEL_SECOND_ELEMENT);
     }
+
+    public void turnToPositionAutonDriving (double pos, String xyz, double topPower, double timeoutS, boolean gyroDrive)
+    {
+        //COUNTER CLOCKWISE IS POSITIVE; CLOCKWISE IS NEGATIVE
+
+        stopAndReset();
+        double originalAngle = readAngle(xyz);
+        double target = pos;
+
+        runtime.reset();
+
+        double angle = readAngle(xyz); //variable for gyro correction around z axis
+        double error = angle - target;
+        double powerScaled = topPower;
+        double degreesTurned;
+
+        /*if(target < 0)
+        {
+            target += 3;
+        }
+        else if(target > 0)
+        {
+            target += .5;
+        }*/
+        do {
+            //salient values
+            angle = readAngle(xyz);
+            error = angle - target;
+            degreesTurned = angle - originalAngle;
+            powerScaled = topPower * Math.abs(error/90) * pidMultiplierTurning(error);
+
+            //prevents extreme slowing towards end of turn
+            if(-6 < error && error < 0)
+            {
+                powerScaled += gyroTurnModLeft;
+            }
+            else if (0 < error && error < 6)
+            {
+                powerScaled += gyroTurnModRight;
+            }
+
+            //telementry
+            telemetry.addData("original angle", originalAngle);
+            telemetry.addData("current angle", readAngle(xyz));
+            telemetry.addData("error", error);
+            telemetry.addData("degrees turned", degreesTurned);
+            telemetry.addData("target", target);
+            telemetry.update();
+
+            //direction handling
+            if (error > 0)
+            {
+                normalDrive(powerScaled, -powerScaled);
+            }
+            else if (error < 0)
+            {
+
+                normalDrive(-powerScaled, powerScaled);
+            }
+
+            updateAngles();
+        }
+        while (opModeIsActive() && ((Math.abs(error) > gyroTurnThreshold) || (gyroDrive && ((Math.abs(error) >= 1.75) && Math.abs(error) <= 2.25))) && (runtime.seconds() < timeoutS));
+
+        //stop turning and reset for next action
+        normalDrive(0, 0);
+        stopAndReset();
+        updateAngles();
+    }
+
     public void turnToPosition (double target, String xyz, double topPower, double timeoutS, boolean isCorrection) {
         //Write code to correct to a target position (NOT FINISHED)
         target*= -1;
@@ -246,10 +335,10 @@ public class PartialAutonBlue extends LinearOpMode {
                         robot.fRMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                         robot.bLMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                         robot.bRMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                        robot.fLMotor.setPower(powerScaled);
-                        robot.fRMotor.setPower(powerScaled);
-                        robot.bLMotor.setPower(powerScaled);
-                        robot.bRMotor.setPower(powerScaled);
+                        robot.fLMotor.setPower(-powerScaled);
+                        robot.fRMotor.setPower(-powerScaled);
+                        robot.bLMotor.setPower(-powerScaled);
+                        robot.bRMotor.setPower(-powerScaled);
                     }
                 }
             }
@@ -308,7 +397,7 @@ public class PartialAutonBlue extends LinearOpMode {
         int newFrontRightTarget = 0;
         int newBackRightTarget = 0;
 
-        int error = getError(speed);
+        int error = getSpeedError(speed);
 
         boolean directionIsTrue = true;
 
@@ -426,7 +515,7 @@ public class PartialAutonBlue extends LinearOpMode {
             sleep(500);   // optional pause after each move
         }
     }
-    public int getError(double speed) { //me being stupid
+    public int getSpeedError(double speed) { //me being stupid
         return (int) (speed * 200);
     }
 }
