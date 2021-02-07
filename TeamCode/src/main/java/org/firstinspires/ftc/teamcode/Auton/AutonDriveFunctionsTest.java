@@ -88,8 +88,9 @@ public class AutonDriveFunctionsTest extends AutonDrivingWIP {
 
         //strafe(25, gyroDriveSpeedStrafe, false, 0, 500, 0, 0);
 
-        gyroStrafeTest(10, 0, false, gyroDriveSpeed, 1);
+        //gyroStrafeTest(10, 0, false, gyroDriveSpeed, 1);
 
+        telemetry.addData("Test Read:", readAngle(xyz));
         telemetry.addData("Path", "Complete");
         telemetry.update();
         sleep(1000);
