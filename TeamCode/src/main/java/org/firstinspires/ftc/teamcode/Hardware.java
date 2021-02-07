@@ -26,6 +26,8 @@ public class Hardware
 
     public DcMotor intakeMotor;
 
+    public DcMotor conveyorMotor;
+
     //declaring values for use with encoders
     public String xyz = "z";
 
@@ -56,6 +58,8 @@ public class Hardware
 
         intakeMotor = hwMap.get(DcMotor.class, "intakeMotor");
 
+        conveyorMotor = hwMap.get(DcMotor.class, "conveyorMotor");
+
         launcherServo = hwMap.get(Servo.class, "launcherServo");
 
         claw = hwMap.get(Servo.class, "claw");
@@ -65,6 +69,7 @@ public class Hardware
         fRMotor.setPower(0);
         bRMotor.setPower(0);
         intakeMotor.setPower(0);
+        conveyorMotor.setPower(0);
 
         launcherMotor.setPower(0);
 
@@ -81,6 +86,7 @@ public class Hardware
         bRMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         launcherMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         intakeMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        conveyorMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         fLMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         bLMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -88,6 +94,7 @@ public class Hardware
         bRMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         launcherMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         intakeMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        conveyorMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
 
         fLMotor.setDirection(DcMotor.Direction.REVERSE);
@@ -96,6 +103,7 @@ public class Hardware
         bRMotor.setDirection(DcMotor.Direction.FORWARD);
         launcherMotor.setDirection(DcMotor.Direction.FORWARD);
         intakeMotor.setDirection(DcMotor.Direction.FORWARD);
+        conveyorMotor.setDirection(DcMotor.Direction.FORWARD);
 
         launcherServo.setPosition(0);
 

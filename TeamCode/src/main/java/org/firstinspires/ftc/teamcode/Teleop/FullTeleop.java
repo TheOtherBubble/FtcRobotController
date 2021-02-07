@@ -48,11 +48,28 @@ public class FullTeleop extends OpMode {
         else {
             robot.claw.setPosition(.5);
         }
-        if (gamepad1.right_bumper) {
+        if (gamepad1.right_trigger > 0.1) {
             robot.launcherMotor.setPower(.78);
         }
         else {
             robot.launcherMotor.setPower(0);
+        }
+        if ( gamepad1.right_bumper)
+        {
+            robot.intakeMotor.setPower(1);
+        }
+        else
+        {
+            robot.intakeMotor.setPower(0);
+        }
+
+        if (gamepad1.left_bumper)
+        {
+            robot.intakeMotor.setPower(1);
+        }
+        else
+        {
+            robot.intakeMotor.setPower(1);
         }
 
         mecanumMove();
