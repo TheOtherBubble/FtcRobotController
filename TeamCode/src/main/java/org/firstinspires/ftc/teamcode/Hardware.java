@@ -103,7 +103,7 @@ public class Hardware
         bRMotor.setDirection(DcMotor.Direction.FORWARD);
         launcherMotor.setDirection(DcMotor.Direction.FORWARD);
         intakeMotor.setDirection(DcMotor.Direction.FORWARD);
-        conveyorMotor.setDirection(DcMotor.Direction.FORWARD);
+        conveyorMotor.setDirection(DcMotor.Direction.REVERSE);
 
         launcherServo.setPosition(0);
 
