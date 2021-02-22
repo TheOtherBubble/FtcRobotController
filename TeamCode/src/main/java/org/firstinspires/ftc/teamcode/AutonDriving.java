@@ -5,7 +5,9 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
+import com.vuforia.EyewearDevice;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
 import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
@@ -18,6 +20,13 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
+
+import java.util.List;
+import org.firstinspires.ftc.robotcore.external.ClassFactory;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
+import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
+import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,15 +41,15 @@ public class AutonDriving extends LinearOpMode {
 
     /* Declare OpMode members. */
     public Hardware robot = new Hardware();
-    private ElapsedTime runtime = new ElapsedTime();
+    public ElapsedTime runtime = new ElapsedTime();
     public String xyz = "z";
     //CONTAINS ALL METHODS AND VARIABlES TO BE EXTENDED BY OTHER AUTON CLASSES
-    static final double     COUNTS_PER_MOTOR_REV = 537.6;    // Currently: Andymark Neverest 20
+    static final double     COUNTS_PER_MOTOR_REV = 383.6;    // Currently: Andymark Neverest 20
     //static final double     COUNTS_PER_REV_ARM = 1495; //torquenado
     //static final double     PULLEY_DIAMETER = 1.3;
     // static final double     COUNTS_PER_INCH_ARM = COUNTS_PER_REV_ARM/(PULLEY_DIAMETER * Math.PI);
-    static final double     DRIVE_GEAR_REDUCTION = .420;    // This is < 1.0 if geared UP //On OUR CENTER MOTOR THE GEAR REDUCTION IS .5
-    static final double     WHEEL_DIAMETER_INCHES = 2.95276;     // For figuring circumference
+    static final double     DRIVE_GEAR_REDUCTION = .66666;    // This is < 1.0 if geared UP //On OUR CENTER MOTOR THE GEAR REDUCTION IS .5
+    static final double     WHEEL_DIAMETER_INCHES = 3.77953;     // For figuring circumference
     static final double     COUNTS_PER_INCH = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
             (WHEEL_DIAMETER_INCHES * Math.PI);
 
@@ -56,6 +65,10 @@ public class AutonDriving extends LinearOpMode {
     public static final String VUFORIA_KEY =
             "AYy6NYn/////AAABmTW3q+TyLUMbg/IXWlIG3BkMMq0okH0hLmwj3CxhPhvUlEZHaOAmESqfePJ57KC2g6UdWLN7OYvc8ihGAZSUJ2JPWAsHQGv6GUAj4BlrMCjHvqhY0w3tV/Azw2wlPmls4FcUCRTzidzVEDy+dtxqQ7U5ZtiQhjBZetAcnLsCYb58dgwZEjTx2+36jiqcFYvS+FlNJBpbwmnPUyEEb32YBBZj4ra5jB0v4IW4wYYRKTNijAQKxco33VYSCbH0at99SqhXECURA55dtmmJxYpFlT/sMmj0iblOqoG/auapQmmyEEXt/T8hv9StyirabxhbVVSe7fPsAueiXOWVm0kCPO+KN/TyWYB9Hg/mSfnNu9i9";
 
+    private static final String TFOD_MODEL_ASSET = "UltimateGoal.tflite";
+    private static final String LABEL_FIRST_ELEMENT = "Quad";
+    private static final String LABEL_SECOND_ELEMENT = "Single";
+
     // Since ImageTarget trackables use mm to specifiy their dimensions, we must use mm for all the physical dimension.
     // We will define some constants and conversions here
     public static final float mmPerInch        = 25.4f;
@@ -70,6 +83,8 @@ public class AutonDriving extends LinearOpMode {
     public OpenGLMatrix lastLocation = null;
     public VuforiaLocalizer vuforia = null;
 
+    public TFObjectDetector tfod;
+
     public WebcamName webcamName = null;
 
     public boolean targetVisible = false;
@@ -80,13 +95,13 @@ public class AutonDriving extends LinearOpMode {
     public VuforiaTrackables targetsSkyStone;
 
 
-    public Orientation angles;
+    public Orientation angles = new Orientation();
     public Acceleration gravity;
     public double startAngle = 0;
 
 
     //gyro drive variables
-    public double gyroDriveThreshold = .7;
+    public double gyroDriveThreshold = 10;
     public double gyroDriveSpeedSlow = .27;
     public double gyroDriveSpeed = .32;
     public double gyroDriveSpeedFast = .35;
@@ -101,7 +116,7 @@ public class AutonDriving extends LinearOpMode {
     private double gyroTurnThreshold = .7;
     private double degreeError = 2;
     public double slowTurnSpeed = .5;
-    public double turnSpeed = .7;
+    public double turnSpeed = .3;
     public double axisTurnSpeed = 1;
     private double gyroTurnBoost = .07;
 
@@ -110,8 +125,9 @@ public class AutonDriving extends LinearOpMode {
     public double EAST = 90;
     public double WEST = -90;
 
-    public double rightBal = .1;
-    public double leftBal = .07;
+
+
+    public double strafeSpeed = .8;
 
     public double clawPos = .35;
 
@@ -209,7 +225,13 @@ public class AutonDriving extends LinearOpMode {
 
     public void updateAngles()
     {
-        angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        try {
+            angles = imu.getAngularOrientation(AxesReference.EXTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        }
+        catch (NullPointerException e)
+        {
+            telemetry.addData("Null Pointer Exception", "true");
+        }
     }
 
 
@@ -232,60 +254,60 @@ public class AutonDriving extends LinearOpMode {
     }
 
 
-    /*public void turnToPosition (double target, String xyz, double topPower, double timeoutS) {
-        //stopAndReset();
-        target*= -1;
-        double originalAngle = readAngle(xyz);
-
-        //wild
-        if (target > 0)
-        {
-            target -= degreeError;
-        }
-        else
-        {
-            target += degreeError;
-        }
-        //telemetry.addData("hello", "1");
-        //telemetry.update();
-
-        runtime.reset();
-
-        double angle; //variable for gyro correction around z axis
-        double error;
-        double powerScaled;
-        do {
-            //telemetry.addData("hello", "2");
-            //sleep(1000);
-            //telemetry.update();
-            angle = readAngle(xyz);
-            error = angle - target;
-            powerScaled = topPower * Math.abs(error / 180) * pidMultiplierTurning(error);
-            if(error < 6)
-            {
-                powerScaled += gyroTurnBoost;
-            }
-
-            //double powerScaled = power*pidMultiplier(error);
-
-            if (error > 0)
-            {
-                normalDrive(powerScaled, -powerScaled);
-            }
-            else if (error < 0)
-            {
-                normalDrive(-powerScaled, powerScaled);
-            }
-            telemetry.addData("original angle", originalAngle);
-            telemetry.addData("current angle", angle);
-            telemetry.addData("error", error);
-            telemetry.addData("target", target);
-            telemetry.update();
-        } while (opModeIsActive() && (Math.abs(error) > gyroTurnThreshold) && (runtime.seconds() < timeoutS));
-        normalDrive(0, 0);
-        //stopAndReset();
-        updateAngles();
-    }*/
+//    public void turnToPosition (double target, String xyz, double topPower, double timeoutS) {
+//        //stopAndReset();
+//        target*= -1;
+//        double originalAngle = readAngle("z");
+//
+//        //wild
+//        /*if (target > 0)
+//        {
+//            target -= degreeError;
+//        }
+//        else
+//        {
+//            target += degreeError;
+//        }*/
+//        //telemetry.addData("hello", "1");
+//        //telemetry.update();
+//
+//        runtime.reset();
+//
+//        double angle; //variable for gyro correction around z axis
+//        double error;
+//        double powerScaled;
+//        do {
+//            //telemetry.addData("hello", "2");
+//            //sleep(1000);
+//            //telemetry.update();
+//            angle = readAngle("z");
+//            error = angle - target;
+//            powerScaled = topPower * Math.abs(error / 180) * pidMultiplierTurning(error);
+//            /*if(error < 6)
+//            {
+//                powerScaled += gyroTurnBoost;
+//            }*/
+//
+//            //double powerScaled = power*pidMultiplier(error);
+//
+//            if (error > 0)
+//            {
+//                normalDrive(powerScaled, -powerScaled);
+//            }
+//            else if (error < 0)
+//            {
+//                normalDrive(-powerScaled, powerScaled);
+//            }
+//            telemetry.addData("original angle", originalAngle);
+//            telemetry.addData("current angle", angle);
+//            telemetry.addData("error", error);
+//            telemetry.addData("target", target);
+//            telemetry.update();
+//        } while (opModeIsActive() && (Math.abs(error) > gyroTurnThreshold) && (runtime.seconds() < timeoutS));
+//        normalDrive(0, 0);
+//        //stopAndReset();
+//        updateAngles();
+//    }
 
     public void turnDegrees (double degrees, String xyz, double topPower, double timeoutS) {
         //stopAndReset();
@@ -350,25 +372,20 @@ public class AutonDriving extends LinearOpMode {
 
                 normalDrive(powerScaled, -powerScaled);
             }
-        } while (opModeIsActive() && (Math.abs(error) > gyroTurnThreshold) && (runtime.seconds() < timeoutS));
+        } while (opModeIsActive() && (Math.abs(error) > 10) && (Math.abs(degrees - degreesTurned) > 10) && (runtime.seconds() < timeoutS));
         normalDrive(0, 0);
         //stopAndReset();
+
+        sleep(300);
+
         updateAngles();
 
     }
 
     public void turnToPosition (double degrees, String xyz, double topPower, double timeoutS, boolean fast) {
-        //stopAndReset();
-
+        //stopAndReset();\
         degrees *= -1;
-        if(degrees < 0)
-        {
-            degrees += degreeError;
-        }
-        else
-        {
-            degrees -= degreeError;
-        }
+
         double originalAngle = readAngle(xyz);
 
         double target = degrees;
@@ -382,31 +399,37 @@ public class AutonDriving extends LinearOpMode {
         runtime.reset();
 
         double angle = readAngle(xyz); //variable for gyro correction around z axis
-        double error = angle - target;
+        double error = target - angle;
         double powerScaled = topPower;
         double degreesTurned;
+        telemetry.addData("original angle", originalAngle);
+        telemetry.addData("current angle", readAngle(xyz));
+        telemetry.addData("error", error);
+        telemetry.addData("target", target);
+        telemetry.update();
+        sleep(1500);
         do {
             //telemetry.addData("hello", "2");
             //sleep(1000);
             //telemetry.update();
             angle = readAngle(xyz);
-            error = angle - target;
+            error = target - angle;
             degreesTurned = angle - originalAngle;
 
             //things to make the turn faster at the beginning and end so it doesn't slow down to basically a stop
-            if(!fast)
-            {
-                powerScaled = topPower * Math.abs(error/180) * pidMultiplierTurning(error);
-            }
-            else
-            {
-                powerScaled = topPower * Math.abs(error/90) * pidMultiplierTurning(error);
-            }
-            if(error < 6)
+//            if(!fast)
+//            {
+//                powerScaled = topPower * Math.abs(error/180) * pidMultiplierTurning(error);
+//            }
+//            else
+//            {
+//                powerScaled = topPower * Math.abs(error/90) * pidMultiplierTurning(error);
+//            }
+            if(Math.abs(error) > 10)
             {
                 powerScaled += gyroTurnBoost;
             }
-            else if (Math.abs(degreesTurned) < 6)
+            else if (Math.abs(degreesTurned) < 10)
             {
                 powerScaled += gyroTurnBoost;
             }
@@ -427,86 +450,87 @@ public class AutonDriving extends LinearOpMode {
 
                 normalDrive(-powerScaled, powerScaled);
             }
-        } while (opModeIsActive() && (Math.abs(error) > gyroTurnThreshold) && (runtime.seconds() < timeoutS));
+        } while (opModeIsActive() && (Math.abs(error) > 15) && (runtime.seconds() < timeoutS));
+
         normalDrive(0, 0);
         //stopAndReset();
         updateAngles();
 
     }
 
-    public void turnToPosition (double degrees, String xyz, double topPower, double timeoutS, boolean fast, boolean clock) {
-        //stopAndReset();
-
-        //forced direction turn to position in case the direction handling doesn't work
-        degrees *= -1;
-        if(degrees < 0)
-        {
-            degrees += degreeError;
-        }
-        else
-        {
-            degrees -= degreeError;
-        }
-        double originalAngle = readAngle(xyz);
-
-        double target = degrees;
-
-        //wild
-
-
-        //telemetry.addData("hello", "1");
-        //telemetry.update();
-
-        runtime.reset();
-
-        double angle = readAngle(xyz); //variable for gyro correction around z axis
-        double error = target - angle;
-        double powerScaled = topPower;
-        double degreesTurned;
-        do {
-            //telemetry.addData("hello", "2");
-            //sleep(1000);
-            //telemetry.update();
-            angle = readAngle(xyz);
-            error = angle - target;
-            degreesTurned = angle - originalAngle;
-
-            //adds boosts in certain places to make the turn faster
-            if(!fast)
-            {
-                powerScaled = topPower * Math.abs(error/180) * pidMultiplierTurning(error);
-            }
-            else
-            {
-                powerScaled = topPower * Math.abs(error/90) * pidMultiplierTurning(error);
-            }
-            if(error < 6)
-            {
-                powerScaled += gyroTurnBoost;
-            }
-            else if (Math.abs(degreesTurned) < 6)
-            {
-                powerScaled += gyroTurnBoost;
-            }
-
-            //double powerScaled = power*pidMultiplier(error);
-            telemetry.addData("original angle", originalAngle);
-            telemetry.addData("current angle", readAngle(xyz));
-            telemetry.addData("error", error);
-            telemetry.addData("target", target);
-            //telemetry.addData("degrees", degrees);
-            telemetry.update();
-                //normalDrive(powerScaled, -powerScaled);
-
-            if(clock)
-                normalDrive(powerScaled, -powerScaled);
-            else normalDrive(-powerScaled, powerScaled);
-        } while (opModeIsActive() && (Math.abs(error) > gyroTurnThreshold) && (runtime.seconds() < timeoutS));
-        normalDrive(0, 0);
-        //stopAndReset();
-        updateAngles();
-
-    }
+//    public void turnToPosition (double degrees, String xyz, double topPower, double timeoutS, boolean fast, boolean clock) {
+//        //stopAndReset();
+//
+//        //forced direction turn to position in case the direction handling doesn't work
+//        degrees *= -1;
+//        if(degrees < 0)
+//        {
+//            degrees += degreeError;
+//        }
+//        else
+//        {
+//            degrees -= degreeError;
+//        }
+//        double originalAngle = readAngle(xyz);
+//
+//        double target = degrees;
+//
+//        //wild
+//
+//
+//        //telemetry.addData("hello", "1");
+//        //telemetry.update();
+//
+//        runtime.reset();
+//
+//        double angle = readAngle(xyz); //variable for gyro correction around z axis
+//        double error = target - angle;
+//        double powerScaled = topPower;
+//        double degreesTurned;
+//        do {
+//            //telemetry.addData("hello", "2");
+//            //sleep(1000);
+//            //telemetry.update();
+//            angle = readAngle(xyz);
+//            error = angle - target;
+//            degreesTurned = angle - originalAngle;
+//
+//            //adds boosts in certain places to make the turn faster
+//            if(!fast)
+//            {
+//                powerScaled = topPower * Math.abs(error/180) * pidMultiplierTurning(error);
+//            }
+//            else
+//            {
+//                powerScaled = topPower * Math.abs(error/90) * pidMultiplierTurning(error);
+//            }
+//            if(error < 6)
+//            {
+//                powerScaled += gyroTurnBoost;
+//            }
+//            else if (Math.abs(degreesTurned) < 6)
+//            {
+//                powerScaled += gyroTurnBoost;
+//            }
+//
+//            //double powerScaled = power*pidMultiplier(error);
+//            telemetry.addData("original angle", originalAngle);
+//            telemetry.addData("current angle", readAngle(xyz));
+//            telemetry.addData("error", error);
+//            telemetry.addData("target", target);
+//            //telemetry.addData("degrees", degrees);
+//            telemetry.update();
+//                //normalDrive(powerScaled, -powerScaled);
+//
+//            if(clock)
+//                normalDrive(powerScaled, -powerScaled);
+//            else normalDrive(-powerScaled, powerScaled);
+//        } while (opModeIsActive() && (Math.abs(error) > gyroTurnThreshold) && (runtime.seconds() < timeoutS));
+//        normalDrive(0, 0);
+//        //stopAndReset();
+//        updateAngles();
+//
+//    }
 
     public void axisTurn (double target, String xyz, double topPower, double timeoutS) {
         //stopAndReset();
@@ -573,10 +597,10 @@ public class AutonDriving extends LinearOpMode {
         //robot.armLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         //robot.susan.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         //
-        robot.bRMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        robot.bLMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        robot.fRMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        robot.fLMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        robot.bRMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        robot.bLMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        robot.fRMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        robot.fLMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         //robot.armExt.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         //robot.armLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         //robot.susan.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -594,9 +618,10 @@ public class AutonDriving extends LinearOpMode {
     }
 
     public double readAngle(String xyz) {
-        Orientation angles;
+        //Orientation angles;
         Acceleration gravity;
-        angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        //angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        updateAngles();
         if (xyz.equals("x")) {
             return angles.thirdAngle;
         } else if (xyz.equals("y")) {
@@ -606,7 +631,7 @@ public class AutonDriving extends LinearOpMode {
         } else {
             return 0;
         }
-    }
+}
 
     public void gyroDrive (double distance, double angle, boolean initBoost, double speed, double speedMult, double timeoutS)
     {
@@ -850,7 +875,7 @@ public class AutonDriving extends LinearOpMode {
         }
     }*/
 
-    public void strafe (int iterations, double speed, boolean isRight, double balanceReduction, double milliseconds, double moreBalance)
+    public void strafe (int iterations, double speed, boolean isRight, double balanceReduction, double milliseconds, double moreBalance, double Angle)
     {
         //balance reduction: add to this if the back of the robot is faster than the front, subtract for opposite
         //more balance: add to this if the robot is driving slightly backwards, subtract for opposite
@@ -899,8 +924,8 @@ public class AutonDriving extends LinearOpMode {
                     {
                         bRSpeed -= balanceReduction;
                         fLSpeed += balanceReduction;
-                        fRSpeed += balanceReduction;
-                        bLSpeed -= balanceReduction;
+                        fRSpeed += balanceReduction - moreBalance;
+                        bLSpeed -= balanceReduction - moreBalance;
 
                         bLSpeed *= -1;
                         fRSpeed *= -1;
@@ -941,7 +966,17 @@ public class AutonDriving extends LinearOpMode {
 
                 }
 
+                //slow down bc jerk causes drift and turning
+                double inc = .85;
+                for(int j = 0; j < 15; j++)
+                {
+                    robot.fLMotor.setPower(robot.fLMotor.getPower()*inc);
+                    robot.fRMotor.setPower(robot.fRMotor.getPower()*inc);
+                    robot.bLMotor.setPower(robot.bLMotor.getPower()*inc);
+                    robot.bRMotor.setPower(robot.bRMotor.getPower()*inc);
+                }
                 normalDrive(0, 0); // stops it after 1 second
+                turnToPosition(Angle, "z", turnSpeed-.05, 500, false);
                 //turnToPosition(-angle, "z", turnSpeed, 4); //corrects at the end of each motion set
                 sleep(300);
                 //telemetry.addData("Target", "%7d:%7d:%7d:%7d", fLTarget, fRTarget, bLTarget, bRTarget);
@@ -1136,5 +1171,161 @@ public class AutonDriving extends LinearOpMode {
      */
     public double getSteer(double error, double PCoeff) {
         return Range.clip(error * PCoeff, -1, 1);
+    }
+
+    public void initVuforia() {
+        /*
+         * Configure Vuforia by creating a Parameter object, and passing it to the Vuforia engine.
+         */
+        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
+
+        parameters.vuforiaLicenseKey = VUFORIA_KEY;
+        parameters.cameraName = hardwareMap.get(WebcamName.class, "Webcam 1");
+
+        //  Instantiate the Vuforia engine
+        vuforia = ClassFactory.getInstance().createVuforia(parameters);
+
+        // Loading trackables is not necessary for the TensorFlow Object Detection engine.
+    }
+
+    /**
+     * Initialize the TensorFlow Object Detection engine.
+     */
+    public void initTfod() {
+        int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
+                "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+        TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
+        tfodParameters.minResultConfidence = 0.8f;
+        tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
+        tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_FIRST_ELEMENT, LABEL_SECOND_ELEMENT);
+    }
+
+    public void encoderDrive(double speed, char direction, double inches, double timeoutS) {
+
+        int newFrontLeftTarget = 0;
+        int newBackLeftTarget = 0;
+        int newFrontRightTarget = 0;
+        int newBackRightTarget = 0;
+
+        int error = getErrorEncoder(speed);
+
+        boolean directionIsTrue = true;
+
+        // Ensure that the opmode is still active
+        if (opModeIsActive()) {
+
+            switch (direction) {
+                case 'f':
+                    newFrontLeftTarget = robot.fLMotor.getCurrentPosition() + (int)(inches * COUNTS_PER_INCH) - error;
+                    newFrontRightTarget = robot.fRMotor.getCurrentPosition() + (int)(inches * COUNTS_PER_INCH)- error;
+                    newBackLeftTarget = robot.bLMotor.getCurrentPosition() + (int)(inches * COUNTS_PER_INCH) - error;
+                    newBackRightTarget = robot.bRMotor.getCurrentPosition() + (int)(inches * COUNTS_PER_INCH) - error;
+                    robot.fLMotor.setTargetPosition(newFrontLeftTarget);
+                    robot.fRMotor.setTargetPosition(newFrontRightTarget);
+                    robot.bLMotor.setTargetPosition(newBackLeftTarget);
+                    robot.bRMotor.setTargetPosition(newBackRightTarget);
+                    break;
+                case 'b':
+                    newFrontLeftTarget = robot.fLMotor.getCurrentPosition() - (int)(inches * COUNTS_PER_INCH) + error;
+                    newFrontRightTarget = robot.fRMotor.getCurrentPosition() - (int)(inches * COUNTS_PER_INCH) + error;
+                    newBackLeftTarget = robot.bLMotor.getCurrentPosition() - (int)(inches * COUNTS_PER_INCH) + error;
+                    newBackRightTarget = robot.bRMotor.getCurrentPosition() - (int)(inches * COUNTS_PER_INCH) + error;
+                    robot.fLMotor.setTargetPosition(newFrontLeftTarget);
+                    robot.fRMotor.setTargetPosition(newFrontRightTarget);
+                    robot.bLMotor.setTargetPosition(newBackLeftTarget);
+                    robot.bRMotor.setTargetPosition(newBackRightTarget);
+                    break;
+                case 'l':
+                    newFrontLeftTarget = robot.fLMotor.getCurrentPosition() - (int)(inches * COUNTS_PER_INCH) + error;
+                    newFrontRightTarget = robot.fRMotor.getCurrentPosition() + (int)(inches * COUNTS_PER_INCH) - error;
+                    newBackLeftTarget = robot.bLMotor.getCurrentPosition() + (int)(inches * COUNTS_PER_INCH) - error;
+                    newBackRightTarget = robot.bRMotor.getCurrentPosition() - (int)(inches * COUNTS_PER_INCH) + error;
+                    robot.fLMotor.setTargetPosition(newFrontLeftTarget);
+                    robot.fRMotor.setTargetPosition(newFrontRightTarget);
+                    robot.bLMotor.setTargetPosition(newBackLeftTarget);
+                    robot.bRMotor.setTargetPosition(newBackRightTarget);
+                    break;
+                case 'r':
+                    newFrontLeftTarget = robot.fLMotor.getCurrentPosition() + (int)(inches * COUNTS_PER_INCH) - error;
+                    newFrontRightTarget = robot.fRMotor.getCurrentPosition() - (int)(inches * COUNTS_PER_INCH) + error;
+                    newBackLeftTarget = robot.bLMotor.getCurrentPosition() - (int)(inches * COUNTS_PER_INCH) + error;
+                    newBackRightTarget = robot.bRMotor.getCurrentPosition() + (int)(inches * COUNTS_PER_INCH) - error;
+                    robot.fLMotor.setTargetPosition(newFrontLeftTarget);
+                    robot.fRMotor.setTargetPosition(newFrontRightTarget);
+                    robot.bLMotor.setTargetPosition(newBackLeftTarget);
+                    robot.bRMotor.setTargetPosition(newBackRightTarget);
+                    break;
+                default:
+                    directionIsTrue = false;
+            }
+            // Determine new target position, and pass to motor controller
+
+            // Turn On RUN_TO_POSITION
+            robot.fLMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.fRMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.bLMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.bRMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+            // reset the timeout time and start motion.
+            runtime.reset();
+            if (directionIsTrue) {
+                robot.fLMotor.setPower(Math.abs(speed));
+                robot.fRMotor.setPower(Math.abs(speed));
+                robot.bLMotor.setPower(Math.abs(speed));
+                robot.bRMotor.setPower(Math.abs(speed));
+            }
+
+            // keep looping while we are still active, and there is time left, and both motors are running.
+            // Note: We use (isBusy() && isBusy()) in the loop test, which means that when EITHER motor hits
+            // its target position, the motion will stop.  This is "safer" in the event that the robot will
+            // always end the motion as soon as possible.
+            // However, if you require that BOTH motors have finished their moves before the robot continues
+            // onto the next step, use (isBusy() || isBusy()) in the loop test.
+            while (opModeIsActive() &&
+                    (directionIsTrue) &&
+                    (runtime.seconds() < timeoutS) &&
+                    (robot.fLMotor.isBusy() && robot.fRMotor.isBusy() && robot.bLMotor.isBusy() && robot.bRMotor.isBusy())) {
+
+                // Display it for the driver.
+                telemetry.addData("Target Positions",  "Running to fL: %7d fR: %7d bL: %7d bR: %7d",
+                        newFrontLeftTarget,
+                        newFrontRightTarget,
+                        newBackLeftTarget,
+                        newBackRightTarget);
+                telemetry.addData("Current Positions",  "Running at fL: %7d fR: %7d bL: %7d bR: %7d",
+                        robot.fLMotor.getCurrentPosition(),
+                        robot.fRMotor.getCurrentPosition(),
+                        robot.bLMotor.getCurrentPosition(),
+                        robot.bRMotor.getCurrentPosition());
+                telemetry.update();
+
+                if (Math.abs(newFrontLeftTarget - robot.fLMotor.getCurrentPosition()) < 50 ||
+                        Math.abs(newFrontRightTarget - robot.fRMotor.getCurrentPosition()) < 50 ||
+                        Math.abs(newBackLeftTarget - robot.bLMotor.getCurrentPosition()) < 50 ||
+                        Math.abs(newBackRightTarget - robot.bRMotor.getCurrentPosition()) < 50) {
+                    break;
+                }
+            }
+
+            // Stop all motion;
+            robot.fLMotor.setPower(0);
+            robot.fRMotor.setPower(0);
+            robot.bLMotor.setPower(0);
+            robot.bRMotor.setPower(0);
+
+            // Turn off RUN_TO_POSITIOn
+
+            robot.fLMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.fRMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.bRMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.bLMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+
+
+            sleep(500);   // optional pause after each move
+        }
+    }
+    public int getErrorEncoder(double speed) { //me being stupid
+        return (int) (speed * 200);
     }
 }

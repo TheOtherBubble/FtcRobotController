@@ -20,7 +20,7 @@ import org.firstinspires.ftc.teamcode.Hardware;
 
 
 @TeleOp(name="GyroTest", group="Test")
-@Disabled
+//@Disabled
 
 public class GyroTest extends OpMode {
 

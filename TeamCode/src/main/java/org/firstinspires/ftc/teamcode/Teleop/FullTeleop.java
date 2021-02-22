@@ -8,15 +8,15 @@ import org.firstinspires.ftc.teamcode.Hardware;
 //import org.firstinspires.ftc.teamcode.src.main.java.org.firstinspires.ftc.teamcode.DriveOnlyHardware;
 
 
-@TeleOp(name="DriveOnlyTeleop", group="Teleop")
+@TeleOp(name="FullTeleop", group="Teleop")
 
 //@Disabled
 
-public class DriveOnlyTeleop extends OpMode {
+public class FullTeleop extends OpMode {
 
     Hardware robot = new Hardware();
 
-    private float drive = .4f;
+    private float drive = .55f;
     //private float BRDrive = 1f;
 
     @Override
@@ -33,6 +33,44 @@ public class DriveOnlyTeleop extends OpMode {
     public void loop()
 
     {
+        if (gamepad1.x) {
+            robot.launcherServo.setPosition(1);
+        }
+        else {
+            robot.launcherServo.setPosition(0);
+        }
+        if (gamepad1.b) {
+            robot.claw.setPosition(1);
+        }
+        else if (gamepad1.a){
+            robot.claw.setPosition(0);
+        }
+        else {
+            robot.claw.setPosition(.5);
+        }
+        if (gamepad1.right_trigger > 0.1) {
+            robot.launcherMotor.setPower(.78);
+        }
+        else {
+            robot.launcherMotor.setPower(0);
+        }
+        if ( gamepad1.right_bumper)
+        {
+            robot.intakeMotor.setPower(1);
+        }
+        else
+        {
+            robot.intakeMotor.setPower(0);
+        }
+
+        if (gamepad1.left_bumper)
+        {
+            robot.intakeMotor.setPower(1);
+        }
+        else
+        {
+            robot.intakeMotor.setPower(1);
+        }
 
         mecanumMove();
 

@@ -12,7 +12,7 @@ import org.firstinspires.ftc.teamcode.AutonDriving;
 import org.firstinspires.ftc.teamcode.Hardware;
 
 //@Disabled
-@Autonomous(name="TurnToPositionTest", group="Test")
+@Autonomous(name="TurnToPositionTest", group="GyroAuton")
 public class TurnToPositionTest extends AutonDriving {
 //    AutonDrivingDriveOnly auton = new AutonDrivingDriveOnly();
 
@@ -56,7 +56,11 @@ public class TurnToPositionTest extends AutonDriving {
 
         //line up with center foundation
         //gyroDrive(10, gyroDriveThreshold);
-        turnToPosition(178, "z", turnSpeed, 10, false);
+        turnToPosition(-70, "z", turnSpeed, 10, false);
+
+        sleep(500);
+
+        turnToPosition(179, "z", turnSpeed, 10, false);
 
         pathComplete(500);
     }
