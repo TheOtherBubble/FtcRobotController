@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.Teleop;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Hardware;
 
@@ -18,8 +17,6 @@ public class FullTeleop extends OpMode {
     Hardware robot = new Hardware();
 
     private float drive = .55f;
-    private boolean intakeOn = false;
-    private ElapsedTime intakeTimer = new ElapsedTime();
     //private float BRDrive = 1f;
 
     @Override
@@ -28,7 +25,8 @@ public class FullTeleop extends OpMode {
         //Initialize the hardware variables.
         //The init() method of the hardware class does all the work here
         robot.init(hardwareMap);
-        intakeTimer.reset();
+
+
     }
 
     @Override
@@ -36,12 +34,11 @@ public class FullTeleop extends OpMode {
 
     {
         if (gamepad1.x) {
-            robot.launcherServo.setPosition(0.05);
+            robot.launcherServo.setPosition(1);
         }
         else {
-            robot.launcherServo.setPosition(0.55);
+            robot.launcherServo.setPosition(0);
         }
-
         if (gamepad1.b) {
             robot.claw.setPosition(1);
         }
@@ -51,19 +48,25 @@ public class FullTeleop extends OpMode {
         else {
             robot.claw.setPosition(.5);
         }
-
         if (gamepad1.right_trigger > 0.1) {
-            robot.launcherMotor.setPower(-.7);
+            robot.launcherMotor.setPower(.78);
         }
         else {
             robot.launcherMotor.setPower(0);
         }
-
-        if (gamepad1.right_bumper) {
-            robot.intakeMotor.setPower(-1);
-            robot.conveyorMotor.setPower(1);
+        if ( gamepad1.right_bumper)
+        {
+            robot.intakeMotor.setPower(1);
         }
-        else if (gamepd1.)
+        else if (gamepad1.left_bumper)
+        {
+            robot.intakeMotor.setPower(-1);
+        }
+        else
+        {
+            robot.intakeMotor.setPower(0);
+        }
+
 
         mecanumMove();
 
@@ -75,10 +78,10 @@ public class FullTeleop extends OpMode {
         double r = Math.hypot(-gamepad1.left_stick_x, gamepad1.left_stick_y);
         double robotAngle = Math.atan2(gamepad1.left_stick_y, -gamepad1.left_stick_x) - Math.PI / 4;
         double rightX = gamepad1.right_stick_x;
-        final double v1 = r * Math.cos(robotAngle) - rightX;
-        final double v2 = r * Math.sin(robotAngle) + rightX;
-        final double v3 = r * Math.sin(robotAngle) - rightX;
-        final double v4 = r * Math.cos(robotAngle) + rightX;
+        final double v1 = r * Math.cos(robotAngle) + rightX;
+        final double v2 = r * Math.sin(robotAngle) - rightX;
+        final double v3 = r * Math.sin(robotAngle) + rightX;
+        final double v4 = r * Math.cos(robotAngle) - rightX;
 
         robot.fLMotor.setPower(-drive * v1);
         robot.fRMotor.setPower(-drive * v2);

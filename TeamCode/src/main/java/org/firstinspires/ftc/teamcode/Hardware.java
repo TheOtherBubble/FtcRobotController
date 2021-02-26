@@ -1,6 +1,9 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.graphics.Color;
+
 import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -27,6 +30,9 @@ public class Hardware
     public DcMotor intakeMotor;
 
     public DcMotor conveyorMotor;
+
+    public ColorSensor leftColor;
+    public ColorSensor rightColor;
 
     //declaring values for use with encoders
     public String xyz = "z";
@@ -63,6 +69,9 @@ public class Hardware
         launcherServo = hwMap.get(Servo.class, "launcherServo");
 
         claw = hwMap.get(Servo.class, "claw");
+
+        rightColor = hwMap.get(ColorSensor.class, "rightColorSensor");
+        leftColor = hwMap.get(ColorSensor.class, "leftColorSensor");
 
         fLMotor.setPower(0);
         bLMotor.setPower(0);
