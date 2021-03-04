@@ -59,6 +59,9 @@ public class ColorSensorTest extends OpMode{
     double          clawOffset  = 0.0 ;                  // Servo mid position
     final double    CLAW_SPEED  = 0.02 ;                 // sets rate to move servo
     double             power       = 0;
+    boolean rightOverLine = false;
+    boolean leftOverLine = false;
+    boolean onLine = false;
     /*
      * Code to run ONCE when the driver hits INIT
      */
@@ -93,17 +96,40 @@ public class ColorSensorTest extends OpMode{
      */
     @Override
     public void loop() {
+        if (robot.leftColor.alpha() > 300) {
+            leftOverLine = true;
+        }
+        else {
+            leftOverLine = false;
+        }
+
+        if (robot.rightColor.alpha() > 325) {
+            rightOverLine = true;
+        }
+        else {
+            rightOverLine = false;
+        }
+
+        if (leftOverLine && rightOverLine) {
+            onLine = true;
+        }
+        else {
+            onLine = false;
+        }
+
+        telemetry.addData("Robot on Line", onLine);
+        telemetry.addLine();
+
         telemetry.addLine("Left Color");
         telemetry.addData("Red Value: ", robot.leftColor.red());
         telemetry.addData("Green Value: ", robot.leftColor.green());
         telemetry.addData("Blue Value: ", robot.leftColor.blue());
-        telemetry.addData("Alpha Value: ", robot.leftColor.alpha());
         telemetry.addLine();
+
         telemetry.addLine("Right Color");
         telemetry.addData("Red Value: ", robot.rightColor.red());
         telemetry.addData("Green Value: ", robot.rightColor.green());
         telemetry.addData("Blue Value: ", robot.rightColor.blue());
-        telemetry.addData("Alpha Value: ", robot.rightColor.alpha());
         telemetry.update();
     }
 
