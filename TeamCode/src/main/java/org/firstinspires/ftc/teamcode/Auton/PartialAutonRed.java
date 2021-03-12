@@ -148,27 +148,24 @@ public class PartialAutonRed extends LinearOpMode {
         if (ringLabel.equals("Quad")) {
             telemetry.addData("Target Zone", "C");
             telemetry.update();
-            encoderDrive(0.5,'r',4.5,4);
-            encoderDrive(0.4,'b',114,10);
-            turnToPosition(90,xyz,0.5,4,false);
-            encoderDrive(0.4,'b',24,5);
+            encoderDrive(0.4,'f',114,10);
+            turnToPosition(90,xyz,0.8,4,false);
+            encoderDrive(0.4,'f',24,5);
         }
 
         else if (ringLabel.equals("Single")) {
             telemetry.addData("Target Zone", "B");
             telemetry.update();
-            encoderDrive(0.5,'r',4.5,4);
-            encoderDrive(0.4,'b',90,7);
-            turnToPosition(90,xyz,0.5,4,false);
-            encoderDrive(0.4,'b',10,5);
+            encoderDrive(0.4,'f',90,7);
+            turnToPosition(90,xyz,0.8,4,false);
+            encoderDrive(0.4,'f',10,5);
         }
         else {
             telemetry.addData("Target Zone", "A");
             telemetry.update();
-            encoderDrive(0.5,'r',4.5,4);
-            encoderDrive(0.4,'b',66,5);
-            turnToPosition(90,xyz,0.5,4,false);
-            encoderDrive(0.4,'b',24,5);
+            encoderDrive(0.4,'f',66,5);
+            turnToPosition(90,xyz,0.8,4,false);
+            encoderDrive(0.4,'f',24,5);
         }
     }
     private void initVuforia() {
