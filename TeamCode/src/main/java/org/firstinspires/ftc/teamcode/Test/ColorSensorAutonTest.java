@@ -94,7 +94,7 @@ public class ColorSensorAutonTest extends AutonDriving {
                 rightOverFirst = false;
             }
 
-        } while (!(rightOverLine || leftOverLine));
+        } while (!(rightOverLine || leftOverLine) && opModeIsActive());
 
         normalDrive(0);
 
@@ -104,7 +104,7 @@ public class ColorSensorAutonTest extends AutonDriving {
                 robot.bLMotor.setPower(0.05);
                 do {
                     leftOverLine = robot.leftColor.alpha() > 300;
-                } while (!leftOverLine);
+                } while (!leftOverLine && opModeIsActive());
                 normalDrive(0);
             }
             else {
@@ -112,13 +112,13 @@ public class ColorSensorAutonTest extends AutonDriving {
                 robot.bRMotor.setPower(-0.05);
                 do {
                     rightOverLine = robot.rightColor.alpha() > 300;
-                } while (!rightOverLine);
+                } while (!rightOverLine && opModeIsActive());
                 normalDrive(0);
                 robot.fLMotor.setPower(0.05);
                 robot.bLMotor.setPower(0.05);
                 do {
                     leftOverLine = robot.leftColor.alpha() > 300;
-                } while (!leftOverLine);
+                } while (!leftOverLine && opModeIsActive());
                 normalDrive(0);
             }
         }
@@ -128,7 +128,7 @@ public class ColorSensorAutonTest extends AutonDriving {
                 robot.bRMotor.setPower(0.05);
                 do {
                     rightOverLine = robot.rightColor.alpha() > 300;
-                } while (!rightOverLine);
+                } while (!rightOverLine && opModeIsActive());
                 normalDrive(0);
             }
             else {
@@ -136,13 +136,13 @@ public class ColorSensorAutonTest extends AutonDriving {
                 robot.bLMotor.setPower(-0.05);
                 do {
                     leftOverLine = robot.leftColor.alpha() > 300;
-                } while (!leftOverLine);
+                } while (!leftOverLine && opModeIsActive());
                 normalDrive(0);
                 robot.fRMotor.setPower(0.05);
                 robot.bRMotor.setPower(0.05);
                 do {
                     rightOverLine = robot.rightColor.alpha() > 300;
-                } while (!rightOverLine);
+                } while (!rightOverLine && opModeIsActive());
                 normalDrive(0);
             }
         }
