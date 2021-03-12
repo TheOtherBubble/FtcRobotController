@@ -34,19 +34,16 @@ public class FullTeleop extends OpMode {
 
     {
         if (gamepad1.x) {
-            robot.launcherServo.setPosition(1);
+            robot.launcherServo.setPosition(0.2746);
         }
         else {
-            robot.launcherServo.setPosition(0);
+            robot.launcherServo.setPosition(.7);
         }
-        if (gamepad1.b) {
-            robot.claw.setPosition(1);
+        if (gamepad1.a){
+            robot.claw.setPosition(0.5);
         }
-        else if (gamepad1.a){
+        else {
             robot.claw.setPosition(0);
-        }
-        else {
-            robot.claw.setPosition(.5);
         }
         if (gamepad1.right_trigger > 0.1) {
             robot.launcherMotor.setPower(.78);
@@ -58,13 +55,16 @@ public class FullTeleop extends OpMode {
         {
             robot.intakeMotor.setPower(1);
         }
-        else if (gamepad1.left_bumper)
+        else {
+            robot.intakeMotor.setPower(0);
+        }
+        if (gamepad1.left_bumper)
         {
-            robot.intakeMotor.setPower(-1);
+            robot.conveyorMotor.setPower(-1);
         }
         else
         {
-            robot.intakeMotor.setPower(0);
+            robot.conveyorMotor.setPower(0);
         }
 
 
@@ -76,8 +76,8 @@ public class FullTeleop extends OpMode {
     {
         //variables
         double r = Math.hypot(-gamepad1.left_stick_x, gamepad1.left_stick_y);
-        double robotAngle = Math.atan2(gamepad1.left_stick_y, -gamepad1.left_stick_x) - Math.PI / 4;
-        double rightX = gamepad1.right_stick_x;
+        double robotAngle = Math.atan2(gamepad1.left_stick_y, gamepad1.left_stick_x) - Math.PI / 4;
+        double rightX = -gamepad1.right_stick_x;
         final double v1 = r * Math.cos(robotAngle) + rightX;
         final double v2 = r * Math.sin(robotAngle) - rightX;
         final double v3 = r * Math.sin(robotAngle) + rightX;

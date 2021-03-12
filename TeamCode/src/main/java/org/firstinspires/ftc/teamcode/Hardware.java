@@ -101,7 +101,7 @@ public class Hardware
         bLMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         fRMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         bRMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        launcherMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        launcherMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         intakeMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         conveyorMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
@@ -110,11 +110,11 @@ public class Hardware
         fRMotor.setDirection(DcMotor.Direction.FORWARD);
         bLMotor.setDirection(DcMotor.Direction.REVERSE);
         bRMotor.setDirection(DcMotor.Direction.FORWARD);
-        launcherMotor.setDirection(DcMotor.Direction.FORWARD);
-        intakeMotor.setDirection(DcMotor.Direction.FORWARD);
-        conveyorMotor.setDirection(DcMotor.Direction.REVERSE);
+        launcherMotor.setDirection(DcMotor.Direction.REVERSE);
+        intakeMotor.setDirection(DcMotor.Direction.REVERSE);
+        conveyorMotor.setDirection(DcMotor.Direction.FORWARD);
 
-        launcherServo.setPosition(0);
+        launcherServo.setPosition(.7);
 
         claw.setPosition(0);
     }
