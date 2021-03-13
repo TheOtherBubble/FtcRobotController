@@ -151,14 +151,19 @@ public class PartialAutonRed extends LinearOpMode {
             encoderDrive(0.4,'f',114,10);
             turnToPosition(90,xyz,0.8,4,false);
             encoderDrive(0.4,'f',24,5);
+            turnToPosition(0, xyz, 0.8, 4, false);
+            encoderDrive(.4, 'b', 50, 4);
+            encoderDrive(.4, 'l', 15, 4);
         }
 
         else if (ringLabel.equals("Single")) {
             telemetry.addData("Target Zone", "B");
             telemetry.update();
-            encoderDrive(0.4,'f',90,7);
+            encoderDrive(0.4,'f',95,7);
             turnToPosition(90,xyz,0.8,4,false);
             encoderDrive(0.4,'f',10,5);
+            turnToPosition(0, xyz, 0.8, 4, false);
+            encoderDrive(.3, 'b', 37, 4);
         }
         else {
             telemetry.addData("Target Zone", "A");
@@ -166,6 +171,9 @@ public class PartialAutonRed extends LinearOpMode {
             encoderDrive(0.4,'f',66,5);
             turnToPosition(90,xyz,0.8,4,false);
             encoderDrive(0.4,'f',24,5);
+            turnToPosition(0, xyz, 0.8, 4, false);
+            encoderDrive(.4, 'b', 12, 4);
+            encoderDrive(.4, 'l', 15, 4);
         }
     }
     private void initVuforia() {
@@ -333,7 +341,7 @@ public class PartialAutonRed extends LinearOpMode {
                     robot.bLMotor.setTargetPosition(newBackLeftTarget);
                     robot.bRMotor.setTargetPosition(newBackRightTarget);
                     break;
-                case 'l':
+                case 'r':
                     newFrontLeftTarget = robot.fLMotor.getCurrentPosition() - (int)(inches * COUNTS_PER_INCH) + error;
                     newFrontRightTarget = robot.fRMotor.getCurrentPosition() + (int)(inches * COUNTS_PER_INCH) - error;
                     newBackLeftTarget = robot.bLMotor.getCurrentPosition() + (int)(inches * COUNTS_PER_INCH) - error;
@@ -343,7 +351,7 @@ public class PartialAutonRed extends LinearOpMode {
                     robot.bLMotor.setTargetPosition(newBackLeftTarget);
                     robot.bRMotor.setTargetPosition(newBackRightTarget);
                     break;
-                case 'r':
+                case 'l':
                     newFrontLeftTarget = robot.fLMotor.getCurrentPosition() + (int)(inches * COUNTS_PER_INCH) - error;
                     newFrontRightTarget = robot.fRMotor.getCurrentPosition() - (int)(inches * COUNTS_PER_INCH) + error;
                     newBackLeftTarget = robot.bLMotor.getCurrentPosition() - (int)(inches * COUNTS_PER_INCH) + error;
