@@ -59,6 +59,7 @@ public class PartialAutonRed extends LinearOpMode {
     private ElapsedTime     runtime = new ElapsedTime();
 
     static final double     FORWARD_SPEED = 0.4;
+    static final double     LAUNCHER_SPEED = 0.78;
 
     private boolean objectInVision = false;
 
@@ -115,6 +116,8 @@ public class PartialAutonRed extends LinearOpMode {
 
         waitForStart();
 
+        encoderDrive(0.4, 'f', 14, 5);
+
         if (opModeIsActive()) {
             runtime.reset();
             do {
@@ -148,18 +151,18 @@ public class PartialAutonRed extends LinearOpMode {
         if (ringLabel.equals("Quad")) {
             telemetry.addData("Target Zone", "C");
             telemetry.update();
-            encoderDrive(0.4,'f',114,10);
+            encoderDrive(0.4,'f',100,10);
             turnToPosition(90,xyz,0.8,4,false);
             encoderDrive(0.4,'f',24,5);
             turnToPosition(0, xyz, 0.8, 4, false);
             encoderDrive(.4, 'b', 50, 4);
-            encoderDrive(.4, 'l', 15, 4);
+            encoderDrive(.4, 'l', 40, 4);
         }
 
         else if (ringLabel.equals("Single")) {
             telemetry.addData("Target Zone", "B");
             telemetry.update();
-            encoderDrive(0.4,'f',95,7);
+            encoderDrive(0.4,'f',81,7);
             turnToPosition(90,xyz,0.8,4,false);
             encoderDrive(0.4,'f',10,5);
             turnToPosition(0, xyz, 0.8, 4, false);
@@ -168,12 +171,20 @@ public class PartialAutonRed extends LinearOpMode {
         else {
             telemetry.addData("Target Zone", "A");
             telemetry.update();
-            encoderDrive(0.4,'f',66,5);
+            encoderDrive(0.4,'f',52,5);
             turnToPosition(90,xyz,0.8,4,false);
             encoderDrive(0.4,'f',24,5);
             turnToPosition(0, xyz, 0.8, 4, false);
             encoderDrive(.4, 'b', 12, 4);
-            encoderDrive(.4, 'l', 15, 4);
+            encoderDrive(.4, 'l', 40, 4);
+        }
+
+        robot.launcherMotor.setPower(LAUNCHER_SPEED);
+
+        sleep(1500);
+        
+        for (int i = 0; i < 3; i++) {
+            shoot();
         }
     }
     private void initVuforia() {
@@ -204,7 +215,7 @@ public class PartialAutonRed extends LinearOpMode {
     }
     public void turnToPosition (double target, String xyz, double topPower, double timeoutS, boolean isCorrection) {
         //Write code to correct to a target position (NOT FINISHED)
-        target*= -1;
+        target *= -1;
         double originalAngle = readAngle(xyz);
 
 
@@ -260,9 +271,13 @@ public class PartialAutonRed extends LinearOpMode {
             }
         } while (opModeIsActive() && ((error > .3) || (error < -0.3)) && (runtime.seconds() < timeoutS));
         normalDrive(0, 0);
-
     }
-
+    public void shoot() {
+        robot.launcherServo.setPosition(0.7);
+        sleep(1250);
+        robot.launcherServo.setPosition(0.2746);
+        sleep(1000);
+    }
     public double pidMultiplierDriving(double error) {
         //equation for power multiplier is x/sqrt(x^2 + C)
         int C = 100;

@@ -112,7 +112,7 @@ public class     AutonVisionTest extends LinearOpMode {
                     }
                 }
                 telemetry.update();
-            } while ((runtime.milliseconds() < 5000 && !(objectInVision)) || runtime.milliseconds() < 1000);
+            } while ((runtime.milliseconds() < 100000 && !(objectInVision)) || runtime.milliseconds() < 100000);
         }
 
         if (ringLabel.equals("Quad")) {
