@@ -58,8 +58,8 @@ public class PartialAutonRed extends LinearOpMode {
     Hardware robot = new Hardware();   // Use a Pushbot's hardware
     private ElapsedTime     runtime = new ElapsedTime();
 
-    static final double     FORWARD_SPEED = 0.4;
-    static final double     LAUNCHER_SPEED = 0.78;
+    static final double     FORWARD_SPEED = 0.5;
+    static double     LAUNCHER_SPEED = 0.62;
 
     private boolean objectInVision = false;
 
@@ -146,46 +146,53 @@ public class PartialAutonRed extends LinearOpMode {
                     }
                 }
                 telemetry.update();
-            } while ((runtime.milliseconds() < 5000 && !(objectInVision)) || runtime.milliseconds() < 1000);
+            } while ((runtime.milliseconds() < 3500 && !(objectInVision)) || runtime.milliseconds() < 1000);
         }
         if (ringLabel.equals("Quad")) {
             telemetry.addData("Target Zone", "C");
             telemetry.update();
-            encoderDrive(0.4,'f',100,10);
-            turnToPosition(90,xyz,0.8,4,false);
-            encoderDrive(0.4,'f',24,5);
-            turnToPosition(0, xyz, 0.8, 4, false);
-            encoderDrive(.4, 'b', 50, 4);
-            encoderDrive(.4, 'l', 40, 4);
+            encoderDrive(FORWARD_SPEED,'f',100,10);
+            turnToPosition(90,xyz,0.8,2.5,false);
+            encoderDrive(FORWARD_SPEED,'f',24,5);
+            turnToPosition(0, xyz, 0.8, 2.5, false);
+            encoderDrive(FORWARD_SPEED, 'b', 52, 4);
+            encoderDrive(FORWARD_SPEED, 'l', 32, 4);
+            turnToPosition(-7, xyz, 0.8, 2, false);
         }
 
         else if (ringLabel.equals("Single")) {
             telemetry.addData("Target Zone", "B");
             telemetry.update();
-            encoderDrive(0.4,'f',81,7);
-            turnToPosition(90,xyz,0.8,4,false);
-            encoderDrive(0.4,'f',10,5);
-            turnToPosition(0, xyz, 0.8, 4, false);
-            encoderDrive(.3, 'b', 37, 4);
+            encoderDrive(FORWARD_SPEED,'f',81,7);
+            turnToPosition(90,xyz,0.8,2.5,false);
+            encoderDrive(FORWARD_SPEED,'f',8,5);
+            turnToPosition(0, xyz, 0.8, 2.5, false);
+            encoderDrive(FORWARD_SPEED, 'b', 36, 4);
+            turnToPosition(-7, xyz, 0.8, 2, false);
         }
         else {
             telemetry.addData("Target Zone", "A");
             telemetry.update();
-            encoderDrive(0.4,'f',52,5);
-            turnToPosition(90,xyz,0.8,4,false);
-            encoderDrive(0.4,'f',24,5);
-            turnToPosition(0, xyz, 0.8, 4, false);
-            encoderDrive(.4, 'b', 12, 4);
-            encoderDrive(.4, 'l', 40, 4);
+            encoderDrive(FORWARD_SPEED,'f',52,5);
+            turnToPosition(90,xyz,0.8,2.5,false);
+            encoderDrive(FORWARD_SPEED,'f',24,5);
+            turnToPosition(0, xyz, 0.8, 2.5, false);
+            encoderDrive(FORWARD_SPEED, 'b', 10, 4);
+            encoderDrive(FORWARD_SPEED, 'l', 40, 4);
+            turnToPosition(-7, xyz, 0.8, 2, false);
         }
+
 
         robot.launcherMotor.setPower(LAUNCHER_SPEED);
 
-        sleep(1500);
+        sleep(2250);
         
         for (int i = 0; i < 3; i++) {
+            encoderDrive(FORWARD_SPEED, 'l', 8, 2.5);
             shoot();
+            robot.launcherMotor.setPower(LAUNCHER_SPEED += (.005 * i));
         }
+        encoderDrive(FORWARD_SPEED,'f',12,5);
     }
     private void initVuforia() {
         /*
@@ -276,7 +283,7 @@ public class PartialAutonRed extends LinearOpMode {
         robot.launcherServo.setPosition(0.7);
         sleep(1250);
         robot.launcherServo.setPosition(0.2746);
-        sleep(1000);
+        sleep(1250);
     }
     public double pidMultiplierDriving(double error) {
         //equation for power multiplier is x/sqrt(x^2 + C)
@@ -288,6 +295,11 @@ public class PartialAutonRed extends LinearOpMode {
         double C = .1;
         return Math.abs(error / Math.sqrt((error * error) + C));
     }
+//    public double pidMultiplierTurningSmall(double error)
+//    {
+//        double C = .01;
+//        return Math.abs(error / (Math.sqrt(error * error) + C));
+//    }
     public void pathComplete(int millisec)
     {
         telemetry.addData("Path", "Complete");

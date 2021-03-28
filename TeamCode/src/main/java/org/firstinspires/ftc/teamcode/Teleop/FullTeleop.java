@@ -46,7 +46,7 @@ public class FullTeleop extends OpMode {
             robot.claw.setPosition(0);
         }
         if (gamepad1.right_trigger > 0.1) {
-            robot.launcherMotor.setPower(.78);
+            robot.launcherMotor.setPower(.6);
         }
         else {
             robot.launcherMotor.setPower(0);
