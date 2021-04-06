@@ -33,32 +33,32 @@ public class FullTeleop extends OpMode {
     public void loop()
 
     {
-        if (gamepad1.x) {
+        if (gamepad1.x || gamepad2.x) {
             robot.launcherServo.setPosition(0.2746);
         }
         else {
             robot.launcherServo.setPosition(.7);
         }
-        if (gamepad1.a){
+        if (gamepad1.a || gamepad2.x){
             robot.claw.setPosition(0.5);
         }
         else {
             robot.claw.setPosition(0);
         }
-        if (gamepad1.right_trigger > 0.1) {
-            robot.launcherMotor.setPower(.78);
+        if (gamepad1.right_trigger > 0.1 || gamepad2.right_trigger >.1) {
+            robot.launcherMotor.setPower(.6);
         }
         else {
             robot.launcherMotor.setPower(0);
         }
-        if ( gamepad1.right_bumper)
+        if ( gamepad1.right_bumper || gamepad2.right_bumper)
         {
             robot.intakeMotor.setPower(1);
         }
         else {
             robot.intakeMotor.setPower(0);
         }
-        if (gamepad1.left_bumper)
+        if (gamepad1.left_bumper || gamepad2.left_bumper)
         {
             robot.conveyorMotor.setPower(-1);
         }
@@ -75,9 +75,16 @@ public class FullTeleop extends OpMode {
     public void mecanumMove()
     {
         //variables
-        double r = Math.hypot(-gamepad1.left_stick_x, gamepad1.left_stick_y);
-        double robotAngle = Math.atan2(gamepad1.left_stick_y, gamepad1.left_stick_x) - Math.PI / 4;
-        double rightX = -gamepad1.right_stick_x;
+        double r = Math.hypot(-gamepad2.left_stick_x, gamepad2.left_stick_y);
+        double robotAngle = Math.atan2(gamepad2.left_stick_y, gamepad2.left_stick_x) - Math.PI / 4;
+        double rightX = -gamepad2.right_stick_x;
+        if (gamepad1.left_stick_x >.1  || gamepad1.left_stick_y > .1) {
+            r = Math.hypot(-gamepad1.left_stick_x, gamepad1.left_stick_y);
+            robotAngle = Math.atan2(gamepad1.left_stick_y, gamepad1.left_stick_x) - Math.PI / 4;
+            rightX = -gamepad1.right_stick_x;
+        }
+
+
         final double v1 = r * Math.cos(robotAngle) + rightX;
         final double v2 = r * Math.sin(robotAngle) - rightX;
         final double v3 = r * Math.sin(robotAngle) + rightX;
