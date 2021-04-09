@@ -23,6 +23,8 @@ public class Hardware
 
     public DcMotor launcherMotor;
 
+    public DcMotor liftMotor;
+
     public Servo launcherServo;
 
     public Servo claw;
@@ -62,13 +64,15 @@ public class Hardware
 
         launcherMotor = hwMap.get(DcMotor.class, "launcherMotor");
 
+        liftMotor = hwMap.get(DcMotor.class, "liftMotor");
+
         intakeMotor = hwMap.get(DcMotor.class, "intakeMotor");
 
         conveyorMotor = hwMap.get(DcMotor.class, "conveyorMotor");
 
         launcherServo = hwMap.get(Servo.class, "launcherServo");
 
-        claw = hwMap.get(Servo.class, "claw");
+        claw = hwMap.get(Servo.class, "clawServo");
 
         rightColor = hwMap.get(ColorSensor.class, "rightColorSensor");
         leftColor = hwMap.get(ColorSensor.class, "leftColorSensor");
@@ -81,6 +85,7 @@ public class Hardware
         conveyorMotor.setPower(0);
 
         launcherMotor.setPower(0);
+        liftMotor.setPower(0);
 
 
         // Set all motors to run without encoders.
@@ -96,6 +101,7 @@ public class Hardware
         launcherMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         intakeMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         conveyorMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        liftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         fLMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         bLMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -104,6 +110,7 @@ public class Hardware
         launcherMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         intakeMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         conveyorMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        liftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
 
         fLMotor.setDirection(DcMotor.Direction.REVERSE);
@@ -112,7 +119,9 @@ public class Hardware
         bRMotor.setDirection(DcMotor.Direction.FORWARD);
         launcherMotor.setDirection(DcMotor.Direction.REVERSE);
         intakeMotor.setDirection(DcMotor.Direction.REVERSE);
-        conveyorMotor.setDirection(DcMotor.Direction.FORWARD);
+        conveyorMotor.setDirection(DcMotor.Direction.REVERSE);
+
+        claw.scaleRange(0,0.5);
 
         launcherServo.setPosition(.7);
 
