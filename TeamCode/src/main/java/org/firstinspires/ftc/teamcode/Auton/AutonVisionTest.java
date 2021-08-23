@@ -118,7 +118,7 @@ public class     AutonVisionTest extends LinearOpMode {
         if (ringLabel.equals("Quad")) {
             telemetry.addData("Target Zone", "C");
             telemetry.update();
-            sleep(5000);
+            sleep(5000); 
 //            drive('f', 3);
 //            sleep(500);
 //            turn('r', .5);
