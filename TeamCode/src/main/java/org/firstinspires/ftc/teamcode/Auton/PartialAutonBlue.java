@@ -59,7 +59,8 @@ public class PartialAutonBlue extends AutonDrivingWIP {
     org.firstinspires.ftc.teamcode.Hardware robot = new org.firstinspires.ftc.teamcode.Hardware();   // Use a Pushbot's hardware
     private ElapsedTime     runtime = new ElapsedTime();
 
-    static final double     FORWARD_SPEED = 0.4;
+    static final double     FORWARD_SPEED = 0.5;
+    static double     LAUNCHER_SPEED = 0.62;
 
     private boolean objectInVision = false;
 
@@ -116,6 +117,8 @@ public class PartialAutonBlue extends AutonDrivingWIP {
 
         waitForStart();
 
+        encoderDrive(0.4, 'f', 14, 5);
+
         if (opModeIsActive()) {
             runtime.reset();
             do {
@@ -149,45 +152,47 @@ public class PartialAutonBlue extends AutonDrivingWIP {
         if (ringLabel.equals("Quad")) {
             telemetry.addData("Target Zone", "C");
             telemetry.update();
-            encoderDrive(0.5,'l',4.5,4);
-            //gyroDrive(4.5, 'l', 0, gyroDriveSpeed, 10);
-            encoderDrive(0.4,'b',114,10);
-            //gyroDrive(114, 'b', 0, gyroDriveSpeed, 10);
-            turnToPosition(90,xyz,0.5,4,false);
-            //turnDegrees(90, xyz, turnSpeed, 10);
-            encoderDrive(0.4,'b',24,5);
-            //gyroDrive(24, 'b', 270, gyroDriveSpeed, 10);
+            encoderDrive(FORWARD_SPEED,'f',100,10);
+            turnToPosition(90,xyz,0.8,2.5,false);
+            encoderDrive(FORWARD_SPEED,'f',24,5);
+            turnToPosition(0, xyz, 0.8, 2.5, false);
+            encoderDrive(FORWARD_SPEED, 'b', 52, 4);
+            encoderDrive(FORWARD_SPEED, 'l', 32, 4);
+            turnToPosition(-7, xyz, 0.8, 2, false);
         }
-
         else if (ringLabel.equals("Single")) {
             telemetry.addData("Target Zone", "B");
             telemetry.update();
-            encoderDrive(0.5,'l',4.5,4);
-
-            encoderDrive(0.4,'b',90,7);
-
-            turnToPosition(90,xyz,0.5,4,false);
-
-            encoderDrive(0.4,'b',10,5);
-            //release claw
-            //raise claw
-            //encoderDrive forward 10
-            //turnToPosition 0
-            //encoderDrive forward 15 (guess value)
-
+            encoderDrive(FORWARD_SPEED,'f',81,7);
+            turnToPosition(90,xyz,0.8,2.5,false);
+            encoderDrive(FORWARD_SPEED,'f',8,5);
+            turnToPosition(0, xyz, 0.8, 2.5, false);
+            encoderDrive(FORWARD_SPEED, 'b', 36, 4);
+            turnToPosition(-7, xyz, 0.8, 2, false);
         }
         else {
             telemetry.addData("Target Zone", "A");
             telemetry.update();
-            encoderDrive(0.5,'l',4.5,4);
-            //gyroDrive(4.5, 'l', 0, gyroDriveSpeed, 10);
-            encoderDrive(0.4,'b',66,5);
-            //gyroDrive(66, 'b', 0, gyroDriveSpeed, 10);
-            turnToPosition(90,xyz,0.5,4,false);
-            //turnDegrees(90, xyz, turnSpeed, 10);
-            encoderDrive(0.4,'b',24,5);
-            //gyroDrive(24, 'b', 270, gyroDriveSpeed, 10);
+            encoderDrive(FORWARD_SPEED,'f',52,5);
+            turnToPosition(90,xyz,0.8,2.5,false);
+            encoderDrive(FORWARD_SPEED,'f',24,5);
+            turnToPosition(0, xyz, 0.8, 2.5, false);
+            encoderDrive(FORWARD_SPEED, 'b', 10, 4);
+            encoderDrive(FORWARD_SPEED, 'l', 40, 4);
+            turnToPosition(-7, xyz, 0.8, 2, false);
         }
+
+
+        robot.launcherMotor.setPower(LAUNCHER_SPEED);
+
+        sleep(2250);
+
+        for (int i = 0; i < 3; i++) {
+            encoderDrive(FORWARD_SPEED, 'l', 8, 2.5);
+            shoot();
+            robot.launcherMotor.setPower(LAUNCHER_SPEED += (.005 * i));
+        }
+        encoderDrive(FORWARD_SPEED,'f',12,5);
     }
 
     public void initVuforia() {
@@ -212,11 +217,16 @@ public class PartialAutonBlue extends AutonDrivingWIP {
         int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
                 "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
-        tfodParameters.minResultConfidence = 0.8f;
+        tfodParameters.minResultConfidence = 0.9f;
         tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
         tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_FIRST_ELEMENT, LABEL_SECOND_ELEMENT);
     }
-
+    public void shoot() {
+        robot.launcherServo.setPosition(0.7);
+        sleep(1250);
+        robot.launcherServo.setPosition(0.2746);
+        sleep(1250);
+    }
     public void turnToPositionAutonDriving (double pos, String xyz, double topPower, double timeoutS, boolean gyroDrive)
     {
         //COUNTER CLOCKWISE IS POSITIVE; CLOCKWISE IS NEGATIVE

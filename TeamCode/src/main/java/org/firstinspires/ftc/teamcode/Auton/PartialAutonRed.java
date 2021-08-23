@@ -116,6 +116,8 @@ public class PartialAutonRed extends LinearOpMode {
 
         waitForStart();
 
+        robot.claw.setPosition(0);
+
         encoderDrive(0.4, 'f', 14, 5);
 
         if (opModeIsActive()) {
@@ -131,14 +133,14 @@ public class PartialAutonRed extends LinearOpMode {
                         // step through the list of recognitions and display boundary info.
                         int i = 0;
                         for (Recognition recognition : updatedRecognitions) {
-                            telemetry.addData(String.format("label (%d)", i), recognition.getLabel());
+                            telemetry.addData("label " + i, recognition.getLabel());
 
-                            telemetry.addData(String.format("  left,top (%d)", i), "%.03f , %.03f", recognition.getLeft(), recognition.getTop());
-                            telemetry.addData(String.format("  right,bottom (%d)", i), "%.03f , %.03f", recognition.getRight(), recognition.getBottom());
+                            telemetry.addData("  left,top " + i, "%.03f , %.03f", recognition.getLeft(), recognition.getTop());
+                            telemetry.addData("  right,bottom " + i, "%.03f , %.03f", recognition.getRight(), recognition.getBottom());
 
                             telemetry.update();
 
-                            if (recognition.getLabel().equals("Quad") || recognition.getLabel().equals("Single")) {
+                            if ((recognition.getLabel().equals("Quad") || recognition.getLabel().equals("Single")) && (recognition.getTop() < (recognition.getImageHeight()/1.5))) {
                                 ringLabel = recognition.getLabel();
                                 objectInVision = true;
                             }
@@ -151,48 +153,60 @@ public class PartialAutonRed extends LinearOpMode {
         if (ringLabel.equals("Quad")) {
             telemetry.addData("Target Zone", "C");
             telemetry.update();
-            encoderDrive(FORWARD_SPEED,'f',100,10);
+            encoderDrive(FORWARD_SPEED,'f',90,10);
             turnToPosition(90,xyz,0.8,2.5,false);
-            encoderDrive(FORWARD_SPEED,'f',24,5);
+            encoderDrive(FORWARD_SPEED,'f',28,5);
+            robot.liftMotor.setPower(-.3);
+            sleep(400);
+            robot.liftMotor.setPower(0);
+            robot.claw.setPosition(1);
             turnToPosition(0, xyz, 0.8, 2.5, false);
-            encoderDrive(FORWARD_SPEED, 'b', 52, 4);
-            encoderDrive(FORWARD_SPEED, 'l', 32, 4);
+            encoderDrive(FORWARD_SPEED, 'b', 42, 4);
+            encoderDrive(FORWARD_SPEED, 'l', 36, 4);
             turnToPosition(-7, xyz, 0.8, 2, false);
         }
 
         else if (ringLabel.equals("Single")) {
             telemetry.addData("Target Zone", "B");
             telemetry.update();
-            encoderDrive(FORWARD_SPEED,'f',81,7);
+            encoderDrive(FORWARD_SPEED,'f',63,7);
             turnToPosition(90,xyz,0.8,2.5,false);
-            encoderDrive(FORWARD_SPEED,'f',8,5);
+            encoderDrive(FORWARD_SPEED,'f',15,5);
+            robot.liftMotor.setPower(-.3);
+            sleep(400);
+            robot.liftMotor.setPower(0);
+            robot.claw.setPosition(1);
             turnToPosition(0, xyz, 0.8, 2.5, false);
-            encoderDrive(FORWARD_SPEED, 'b', 36, 4);
+            encoderDrive(FORWARD_SPEED, 'b', 22, 4);
+            encoderDrive(FORWARD_SPEED, 'l', 7, 1);
             turnToPosition(-7, xyz, 0.8, 2, false);
         }
         else {
             telemetry.addData("Target Zone", "A");
             telemetry.update();
-            encoderDrive(FORWARD_SPEED,'f',52,5);
+            encoderDrive(FORWARD_SPEED,'f',45,5);
             turnToPosition(90,xyz,0.8,2.5,false);
-            encoderDrive(FORWARD_SPEED,'f',24,5);
+            encoderDrive(FORWARD_SPEED,'f',33,5);
+            robot.liftMotor.setPower(-.3);
+            sleep(400);
+            robot.liftMotor.setPower(0);
+            robot.claw.setPosition(1);
             turnToPosition(0, xyz, 0.8, 2.5, false);
-            encoderDrive(FORWARD_SPEED, 'b', 10, 4);
-            encoderDrive(FORWARD_SPEED, 'l', 40, 4);
+            encoderDrive(FORWARD_SPEED, 'b', 8, 4);
+            encoderDrive(FORWARD_SPEED, 'l', 47, 4);
             turnToPosition(-7, xyz, 0.8, 2, false);
         }
 
 
         robot.launcherMotor.setPower(LAUNCHER_SPEED);
 
-        sleep(2250);
+        sleep(1550);
         
         for (int i = 0; i < 3; i++) {
-            encoderDrive(FORWARD_SPEED, 'l', 8, 2.5);
+            encoderDrive(FORWARD_SPEED, 'l', 13, 2.5);
             shoot();
-            robot.launcherMotor.setPower(LAUNCHER_SPEED += (.005 * i));
         }
-        encoderDrive(FORWARD_SPEED,'f',12,5);
+        encoderDrive(FORWARD_SPEED,'f',13,5);
     }
     private void initVuforia() {
         /*
@@ -216,7 +230,7 @@ public class PartialAutonRed extends LinearOpMode {
         int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
                 "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
-        tfodParameters.minResultConfidence = 0.8f;
+        tfodParameters.minResultConfidence = 0.85f;
         tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
         tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_FIRST_ELEMENT, LABEL_SECOND_ELEMENT);
     }
@@ -281,9 +295,9 @@ public class PartialAutonRed extends LinearOpMode {
     }
     public void shoot() {
         robot.launcherServo.setPosition(0.7);
-        sleep(1250);
+        sleep(1000);
         robot.launcherServo.setPosition(0.2746);
-        sleep(1250);
+        sleep(1000);
     }
     public double pidMultiplierDriving(double error) {
         //equation for power multiplier is x/sqrt(x^2 + C)
@@ -455,7 +469,7 @@ public class PartialAutonRed extends LinearOpMode {
 
 
 
-            sleep(500);   // optional pause after each move
+            sleep(300);   // optional pause after each move
         }
     }
     public int getError(double speed) { //me being stupid
