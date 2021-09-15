@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.Hardware;
+import org.firstinspires.ftc.teamcode.MecanumHardware;
 
 //import org.firstinspires.ftc.teamcode.src.main.java.org.firstinspires.ftc.teamcode.DriveOnlyHardware;
 
@@ -14,7 +15,7 @@ import org.firstinspires.ftc.teamcode.Hardware;
 
 public class DriveOnlyTeleop extends OpMode {
 
-    Hardware robot = new Hardware();
+    MecanumHardware robot = new MecanumHardware();
 
     private float drive = .4f;
     //private float BRDrive = 1f;
@@ -43,7 +44,7 @@ public class DriveOnlyTeleop extends OpMode {
         //variables
         double r = Math.hypot(-gamepad1.left_stick_x, gamepad1.left_stick_y);
         double robotAngle = Math.atan2(gamepad1.left_stick_y, -gamepad1.left_stick_x) - Math.PI / 4;
-        double rightX = gamepad1.right_stick_x;
+        double rightX = -gamepad1.right_stick_x;
         final double v1 = r * Math.cos(robotAngle) + rightX;
         final double v2 = r * Math.sin(robotAngle) - rightX;
         final double v3 = r * Math.sin(robotAngle) + rightX;
@@ -58,5 +59,11 @@ public class DriveOnlyTeleop extends OpMode {
         telemetry.addData("fRPower", -drive * v2);
         telemetry.addData("bLPower", -drive * v3);
         telemetry.addData("bRPower", -drive * v4);
+
+        telemetry.addData("Encoder port 1 back left",  robot.bLMotor.getCurrentPosition());
+        telemetry.addData("Encoder port 2 front right", robot.fRMotor.getCurrentPosition());
+        telemetry.addData("Encoder port 3 back right", robot.bRMotor.getCurrentPosition());
+
+        telemetry.update();
     }
 }
