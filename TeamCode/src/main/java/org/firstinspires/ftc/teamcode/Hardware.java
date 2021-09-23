@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.TouchSensor;
 
 //public class package org.firstinspires.ftc.teamcode.src;
 
@@ -35,6 +36,7 @@ public class Hardware
 
     public ColorSensor leftColor;
     public ColorSensor rightColor;
+    public TouchSensor magnetLimit;
 
     //declaring values for use with encoders
     public String xyz = "z";

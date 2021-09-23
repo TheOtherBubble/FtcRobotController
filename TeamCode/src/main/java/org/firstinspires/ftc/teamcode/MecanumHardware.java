@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.TouchSensor;
 
 //public class package org.firstinspires.ftc.teamcode.src;
 
@@ -17,6 +18,7 @@ public class MecanumHardware
     public DcMotor bLMotor;
     public DcMotor bRMotor;
 
+    public TouchSensor magnetLimit;
 
     //declaring values for use with encoders
     public String xyz = "z";
@@ -46,6 +48,7 @@ public class MecanumHardware
         bRMotor = hwMap.get(DcMotor.class, "bRMotor");
         bLMotor = hwMap.get(DcMotor.class, "bLMotor");
 
+        magnetLimit = hwMap.get(TouchSensor.class, "magnetLimit");
 
         fLMotor.setPower(0);
         bLMotor.setPower(0);

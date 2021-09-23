@@ -64,6 +64,8 @@ public class DriveOnlyTeleop extends OpMode {
         telemetry.addData("Encoder port 2 front right", robot.fRMotor.getCurrentPosition());
         telemetry.addData("Encoder port 3 back right", robot.bRMotor.getCurrentPosition());
 
+        telemetry.addData("MagnetLimitSwitch", robot.magnetLimit.isPressed());
+
         telemetry.update();
     }
 }
