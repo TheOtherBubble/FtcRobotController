@@ -70,6 +70,35 @@ public class EncoderAutonDriveTest extends LinearOpMode {
 
     static final double     FORWARD_SPEED = 0.2;
 
+
+    public void odometryDrive(int inches, double power, double timeoutS) {
+        int startLeftCounts = robot.bLMotor.getCurrentPosition();
+        int startRightCounts = robot.bRMotor.getCurrentPosition();
+
+        int change = (int) (inches * robot.ENCODER_COUNTS_PER_INCH);
+
+        int targetLeftCounts = startLeftCounts + change;
+        int targetRightCounts = startRightCounts - change;
+
+        if (change < 0) {
+            power *= -1;
+        }
+        int leftError = 0;
+        int rightError = 0;
+        runtime.reset();
+        do {
+            leftError = robot.bLMotor.getCurrentPosition() - startLeftCounts;
+            rightError = robot.bRMotor.getCurrentPosition() + startRightCounts;
+
+            power -= power;
+            robot.bRMotor.setPower(power);
+            robot.bLMotor.setPower(power);
+            robot.fLMotor.setPower(power);
+            robot.fRMotor.setPower(power);
+        } while ((opModeIsActive() && runtime.seconds() < timeoutS) && (Math.abs(leftError) <= 100 && Math.abs(rightError) <= 100));
+
+    }
+
     @Override
     public void runOpMode() {
 
@@ -84,19 +113,15 @@ public class EncoderAutonDriveTest extends LinearOpMode {
 
         // Step through each leg of the path, ensuring that the Auto mode has not been stopped along the way
 
-        // Step 1:  Drive forward for 3 seconds
-        robot.fLMotor.setPower(FORWARD_SPEED);
-        robot.fRMotor.setPower(FORWARD_SPEED);
-        robot.bLMotor.setPower(FORWARD_SPEED);
-        robot.bRMotor.setPower(FORWARD_SPEED);
+        // Step 1:  Drive forward for 3 second
 
         runtime.reset();
         while (opModeIsActive() && (runtime.seconds() < 0.5)) {
             //telemetry.addData("Path", "Leg 1: %2.5f S Elapsed", runtime.seconds());
             telemetry.addData("Runtime", runtime);
-            telemetry.addData("Encoder port 1 back left",  robot.bLMotor.getCurrentPosition());
-            telemetry.addData("Encoder port 2 front right", robot.fRMotor.getCurrentPosition());
-            telemetry.addData("Encoder port 3 back right", robot.bRMotor.getCurrentPosition());
+            telemetry.addData("Encoder port 1 back left",  robot.bLMotor.getCurrentPosition()); //left side of robot
+            telemetry.addData("Encoder port 2 front right", robot.fRMotor.getCurrentPosition()); //side to side robot movement
+            telemetry.addData("Encoder port 3 back right", robot.bRMotor.getCurrentPosition()); //right side of robot
             telemetry.update();
         }
 
@@ -108,8 +133,6 @@ public class EncoderAutonDriveTest extends LinearOpMode {
         //Right encoder - back right motor
         //Middle encoder - front right motor
         //Left encoder - back left motor
-
-        sleep(50000);
 //
 //        // Step 2:  Spin right for 1.3 seconds
 //        robot.fLMotor.setPower(FORWARD_SPEED);
