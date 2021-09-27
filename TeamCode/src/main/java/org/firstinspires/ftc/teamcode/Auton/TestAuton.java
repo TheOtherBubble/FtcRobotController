@@ -39,13 +39,14 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 import org.firstinspires.ftc.teamcode.AutonDriving;
+import org.firstinspires.ftc.teamcode.AutonDrivingWIP;
 import org.firstinspires.ftc.teamcode.Hardware;
 
 import java.util.List;
 
 @Autonomous(name="Test Auton", group="FullAuton")
 //@Disabled
-public class TestAuton extends AutonDriving {
+public class TestAuton extends AutonDrivingWIP {
 
     /* Declare OpMode members. */
     Hardware robot = new Hardware();   // Use a Pushbot's hardware
